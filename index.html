@@ -1394,61 +1394,158 @@
 </section>
 
 
-        <!-- =====================================
-             LOGIN / ACCOUNT
-        ====================================== -->
+     <!-- =====================================
+     LOGIN / ACCOUNT
+====================================== -->
 
-        <section id="login" class="section">
+<section id="login" class="section login-section">
 
-            <div class="container">
+    <div class="container">
 
+        <div class="section-heading">
 
-                <p class="section-label">
-                    Account
-                </p>
+            <p class="section-label">
+                Client Account
+            </p>
 
+            <h2 class="section-title">
+                Manage Your
+                <span>Projects.</span>
+            </h2>
 
-                <h2 class="section-title">
-                    Client Account
-                </h2>
+            <p class="section-description">
+                Login to your account to manage orders,
+                track projects and receive work updates.
+            </p>
 
-
-                <p class="section-description">
-
-                    Create an account or login to manage
-                    your profile, orders and project tracking.
-
-                </p>
-
-
-                <div class="account-placeholder">
+        </div>
 
 
-                    <a
-                        href="#"
-                        class="btn primary-btn">
+        <div class="login-card">
 
-                        Login
+            <!-- LOGIN HEADER -->
 
-                    </a>
+            <div class="login-header">
 
-
-                    <a
-                        href="#"
-                        class="btn secondary-btn">
-
-                        Create Account
-
-                    </a>
-
-
+                <div class="login-icon">
+                    R
                 </div>
+
+                <h3>
+                    Welcome Back
+                </h3>
+
+                <p>
+                    Login to access your client dashboard.
+                </p>
 
             </div>
 
-        </section>
+
+            <!-- LOGIN FORM -->
+
+            <form id="loginForm">
+
+                <div class="form-group">
+
+                    <label for="loginEmail">
+                        Email Address
+                    </label>
+
+                    <input
+                        type="email"
+                        id="loginEmail"
+                        name="email"
+                        placeholder="Enter your email"
+                        autocomplete="email"
+                        required>
+
+                </div>
 
 
+                <div class="form-group">
+
+                    <label for="loginPassword">
+                        Password
+                    </label>
+
+                    <input
+                        type="password"
+                        id="loginPassword"
+                        name="password"
+                        placeholder="Enter your password"
+                        autocomplete="current-password"
+                        required>
+
+                </div>
+
+
+                <div class="login-options">
+
+                    <label class="remember-me">
+
+                        <input
+                            type="checkbox"
+                            id="rememberMe">
+
+                        <span>
+                            Remember me
+                        </span>
+
+                    </label>
+
+
+                    <a href="#contact">
+                        Forgot Password?
+                    </a>
+
+                </div>
+
+
+                <button
+                    type="submit"
+                    class="btn login-submit-btn">
+
+                    Login
+
+                </button>
+
+            </form>
+
+
+            <!-- REGISTER -->
+
+            <div class="login-divider">
+
+                <span>
+                    New here?
+                </span>
+
+            </div>
+
+
+            <a
+                href="#contact"
+                class="btn register-btn">
+
+                Create Account
+
+            </a>
+
+
+            <p class="login-note">
+
+                Your account will allow you to manage orders,
+                track project progress and receive important
+                work updates.
+
+            </p>
+
+        </div>
+
+    </div>
+
+</section> 
     </main>
 
 
