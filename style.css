@@ -1761,6 +1761,400 @@ img {
 
 
     .
+
+   /* =====================================================
+   WORK TRACKING
+===================================================== */
+
+.tracking-section {
+    background:
+        radial-gradient(
+            circle at 90% 30%,
+            rgba(37, 99, 235, 0.07),
+            transparent 32%
+        ),
+        #080a0e;
+}
+
+.tracking-card {
+    max-width: 900px;
+
+    margin: 50px auto 0;
+
+    padding: 32px;
+
+    border:
+        1px solid
+        rgba(255,255,255,0.08);
+
+    border-radius: 20px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255,255,255,0.045),
+            rgba(255,255,255,0.015)
+        );
+
+    box-shadow:
+        0 15px 45px
+        rgba(0,0,0,0.25);
+}
+
+
+/* TOP */
+
+.tracking-top {
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 20px;
+
+    padding-bottom: 25px;
+
+    border-bottom:
+        1px solid
+        rgba(255,255,255,0.07);
+}
+
+.tracking-label {
+    display: block;
+
+    margin-bottom: 7px;
+
+    color: #707b8c;
+
+    font-size: 11px;
+
+    letter-spacing: 1.5px;
+}
+
+.tracking-top strong {
+    color: #ffffff;
+
+    font-size: 18px;
+}
+
+.tracking-status {
+    padding: 8px 14px;
+
+    border:
+        1px solid
+        rgba(96,165,250,0.25);
+
+    border-radius: 50px;
+
+    background:
+        rgba(37,99,235,0.10);
+
+    color: #93c5fd;
+
+    font-size: 12px;
+
+    font-weight: 700;
+}
+
+
+/* PROGRESS */
+
+.progress-area {
+    padding: 28px 0;
+}
+
+.progress-header {
+    display: flex;
+
+    justify-content: space-between;
+
+    margin-bottom: 10px;
+
+    color: #9ca3af;
+
+    font-size: 13px;
+}
+
+.progress-header strong {
+    color: #60a5fa;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 8px;
+
+    overflow: hidden;
+
+    border-radius: 50px;
+
+    background:
+        rgba(255,255,255,0.07);
+}
+
+.progress-fill {
+    width: 60%;
+    height: 100%;
+
+    border-radius: inherit;
+
+    background:
+        linear-gradient(
+            90deg,
+            #2563eb,
+            #60a5fa
+        );
+
+    box-shadow:
+        0 0 15px
+        rgba(37,99,235,0.35);
+}
+
+
+/* TRACKING STEPS */
+
+.tracking-steps {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 0;
+
+    margin-top: 5px;
+}
+
+.tracking-step {
+    position: relative;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 15px;
+
+    padding: 17px 0;
+
+    color: #687384;
+}
+
+.tracking-step:not(:last-child)::after {
+    content: "";
+
+    position: absolute;
+
+    left: 19px;
+    top: 55px;
+
+    width: 1px;
+    height: 28px;
+
+    background:
+        rgba(255,255,255,0.08);
+}
+
+.step-icon {
+    width: 39px;
+    height: 39px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    border:
+        1px solid
+        rgba(255,255,255,0.10);
+
+    border-radius: 50%;
+
+    background:
+        rgba(255,255,255,0.025);
+
+    color: #697586;
+
+    font-size: 11px;
+
+    font-weight: 800;
+}
+
+.tracking-step strong {
+    display: block;
+
+    margin-bottom: 4px;
+
+    color: #8d98a8;
+
+    font-size: 14px;
+}
+
+.tracking-step span {
+    color: #606b7a;
+
+    font-size: 12px;
+}
+
+
+/* COMPLETED */
+
+.tracking-step.completed .step-icon {
+    border-color:
+        rgba(96,165,250,0.35);
+
+    background:
+        rgba(37,99,235,0.12);
+
+    color: #60a5fa;
+}
+
+.tracking-step.completed strong {
+    color: #cbd5e1;
+}
+
+
+/* ACTIVE */
+
+.tracking-step.active .step-icon {
+    border-color:
+        #60a5fa;
+
+    background:
+        #2563eb;
+
+    color: #ffffff;
+
+    box-shadow:
+        0 0 18px
+        rgba(37,99,235,0.30);
+}
+
+.tracking-step.active strong {
+    color: #ffffff;
+}
+
+.tracking-step.active span {
+    color: #93c5fd;
+}
+
+
+/* PROJECT INFO */
+
+.project-info {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, 1fr);
+
+    gap: 12px;
+
+    margin-top: 25px;
+
+    padding-top: 25px;
+
+    border-top:
+        1px solid
+        rgba(255,255,255,0.07);
+}
+
+.project-info div {
+    padding: 15px;
+
+    border-radius: 11px;
+
+    background:
+        rgba(255,255,255,0.025);
+
+    border:
+        1px solid
+        rgba(255,255,255,0.05);
+}
+
+.project-info span {
+    display: block;
+
+    margin-bottom: 6px;
+
+    color: #707b8c;
+
+    font-size: 11px;
+}
+
+.project-info strong {
+    color: #dbe4ef;
+
+    font-size: 13px;
+}
+
+
+/* UPDATE MESSAGE */
+
+.tracking-message {
+    margin-top: 15px;
+
+    padding: 18px;
+
+    border-left:
+        3px solid
+        #2563eb;
+
+    border-radius: 8px;
+
+    background:
+        rgba(37,99,235,0.06);
+}
+
+.tracking-message strong {
+    display: block;
+
+    margin-bottom: 7px;
+
+    color: #ffffff;
+
+    font-size: 13px;
+}
+
+.tracking-message p {
+    color: #7f8a99;
+
+    font-size: 13px;
+
+    line-height: 1.6;
+}
+
+
+/* MOBILE */
+
+@media (max-width: 650px) {
+
+    .tracking-card {
+        margin-top: 35px;
+
+        padding: 22px;
+    }
+
+    .tracking-top {
+        align-items: flex-start;
+
+        flex-direction: column;
+    }
+
+    .project-info {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+@media (max-width: 420px) {
+
+    .tracking-card {
+        padding: 18px;
+    }
+
+    .tracking-step {
+        gap: 12px;
+    }
+
+}
    
 }
 
