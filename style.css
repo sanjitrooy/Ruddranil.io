@@ -383,30 +383,19 @@ img {
     z-index: 2;
 
     width: min(390px, 80vw);
-
     aspect-ratio: 0.78;
 
     overflow: hidden;
 
-    border-radius:
-        8px
-        8px
-        90px
-        8px;
+    border-radius: 8px 8px 90px 8px;
 
-    background:
-        linear-gradient(
-            145deg,
-            #171b24,
-            #090b0f
-        );
+    background: #080a0e;
 
     border: 1px solid rgba(255,255,255,0.08);
 
     box-shadow:
         0 30px 80px rgba(0,0,0,0.55);
 }
-
 
 /* PHOTO PLACEHOLDER */
 
