@@ -2927,7 +2927,7 @@ box-shadow: none;
 .profile-frame {
     position: relative;
     overflow: hidden;
-    background: #080a0e;
+    background: Transparent;
 }
 
 /* Soft dark fade behind the photo */
