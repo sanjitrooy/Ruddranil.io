@@ -2957,7 +2957,7 @@ box-shadow: none;
     display: block;
 
     object-fit: cover;
-    object-position: center top;
+    object-position: center center;
 
     filter:
         grayscale(100%)
