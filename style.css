@@ -2957,8 +2957,8 @@ box-shadow: none;
     display: block;
 
     object-fit: cover;
-    object-position: center center;
-    mix-blennd-mode: screeen;
+    object-position: center top;
+    
     filter:
         grayscale(100%)
         contrast(1.08)
