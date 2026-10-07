@@ -296,7 +296,7 @@ img {
 
 .hero-image {
     position: relative;
-    min-height: 520px;
+    min-height: 580px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -304,18 +304,18 @@ img {
 
 .image-glow {
     position: absolute;
-    width: 360px;
-    height: 360px;
+    width: 420px;
+    height: 420px;
     border-radius: 50%;
-    background: rgba(37, 99, 235, 0.25);
-    filter: blur(75px);
+    background: rgba(37, 99, 235, 0.28);
+    filter: blur(85px);
     z-index: 1;
 }
 
 .profile-frame {
     position: relative;
     z-index: 2;
-    width: min(500px, 90vw);
+    width: min(520px, 92vw);
     aspect-ratio: 0.78;
     overflow: hidden;
     border-radius: 0;
@@ -328,6 +328,21 @@ img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    filter: grayscale(85%) contrast(1.1);
+    position: relative;
+    z-index: 2;
+}
+
+.profile-frame::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 35%;
+    background: linear-gradient(to bottom, transparent 0%, rgba(8, 10, 14, 0.3) 40%, rgba(8, 10, 14, 0.9) 100%);
+    pointer-events: none;
+    z-index: 3;
 }
 
 .photo-placeholder {
@@ -1003,6 +1018,7 @@ img {
 .social-links a:hover {
     background: rgba(96, 165, 250, 0.2);
     border-color: #60a5fa;
+    transform: translateY(-2px);
 }
 
 
@@ -1010,29 +1026,22 @@ img {
    FOOTER
 ===================================================== */
 
-.site-footer {
-    padding: 60px 0 30px;
+.footer {
     background: #050609;
     border-top: 1px solid rgba(255,255,255,0.06);
+    padding: 40px 0;
 }
 
 .footer-content {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 40px;
     margin-bottom: 40px;
 }
 
-.footer-section h3 {
-    color: #ffffff;
-    font-size: 18px;
-    margin-bottom: 16px;
-}
-
 .footer-section h4 {
     color: #ffffff;
-    font-size: 14px;
-    font-weight: 700;
+    font-size: 16px;
     margin-bottom: 16px;
 }
 
@@ -1047,7 +1056,7 @@ img {
 }
 
 .footer-section li {
-    margin-bottom: 10px;
+    margin-bottom: 12px;
 }
 
 .footer-section a {
@@ -1060,69 +1069,40 @@ img {
     color: #60a5fa;
 }
 
-.footer-social {
-    display: flex;
-    gap: 10px;
-}
-
-.footer-social a {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 40px;
-    height: 40px;
-    border-radius: 8px;
-    background: rgba(96, 165, 250, 0.1);
-    color: #60a5fa;
-    font-size: 12px;
-    font-weight: 700;
-}
-
-.footer-social a:hover {
-    background: rgba(96, 165, 250, 0.2);
-}
-
 .footer-bottom {
-    padding-top: 20px;
+    padding-top: 30px;
     border-top: 1px solid rgba(255,255,255,0.06);
     text-align: center;
-    color: #7f8898;
-    font-size: 14px;
+    color: #64748b;
+    font-size: 13px;
 }
 
 
 /* =====================================================
-   TABLET BREAKPOINT: 768px
+   RESPONSIVE MEDIA QUERIES
 ===================================================== */
+
+/* TABLET (768px) */
 
 @media (max-width: 768px) {
 
-    .navbar-container {
-        min-height: 64px;
-        padding: 0 16px;
-    }
-
-    .logo {
-        font-size: 22px;
-    }
-
     .menu-toggle {
-        display: block;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
     .main-nav {
-        position: fixed;
-        top: 64px;
+        position: absolute;
+        top: 72px;
         left: 0;
         right: 0;
-        width: 100%;
         flex-direction: column;
-        align-items: stretch;
         gap: 0;
-        padding: 12px 0;
-        background: rgba(8,10,14,0.98);
+        background: rgba(8, 10, 14, 0.98);
         border-bottom: 1px solid rgba(255,255,255,0.08);
-        box-shadow: 0 20px 40px rgba(0,0,0,0.30);
+        backdrop-filter: blur(14px);
+        padding: 20px;
         max-height: 0;
         overflow: hidden;
         transition: max-height 0.3s ease;
@@ -1130,13 +1110,12 @@ img {
     }
 
     .main-nav.active {
-        max-height: 400px;
+        max-height: 500px;
     }
 
     .main-nav a {
-        padding: 14px 20px;
-        border-bottom: 1px solid rgba(255,255,255,0.04);
-        font-size: 15px;
+        padding: 12px 0;
+        width: 100%;
     }
 
     .main-nav a:not(.login-btn)::after {
@@ -1144,82 +1123,33 @@ img {
     }
 
     .login-btn {
-        margin: 10px 20px;
-        width: calc(100% - 40px);
+        width: 100%;
         text-align: center;
-        padding: 12px 18px;
-    }
-
-    .hero {
-        min-height: auto;
-        padding: 60px 0;
+        margin-top: 10px;
     }
 
     .hero-content {
         grid-template-columns: 1fr;
         gap: 40px;
-        text-align: center;
-    }
-
-    .hero-text {
-        margin: 0 auto;
-    }
-
-    .hero-description {
-        margin: 0 auto 24px;
-    }
-
-    .hero-buttons {
-        justify-content: center;
     }
 
     .hero-image {
-        min-height: 350px;
+        min-height: 400px;
         order: -1;
     }
 
-    .profile-frame {
-        width: min(280px, 80vw);
-    }
-
     .image-glow {
-        width: 280px;
-        height: 280px;
+        width: 300px;
+        height: 300px;
+        filter: blur(70px);
     }
 
-    .section {
-        padding: 60px 0;
-    }
-
-    .section-heading {
-        margin-bottom: 50px;
+    .profile-frame {
+        width: min(380px, 85vw);
     }
 
     .about-grid {
         grid-template-columns: 1fr;
-        gap: 20px;
-    }
-
-    .about-card,
-    .experience-card {
-        padding: 24px;
-    }
-
-    .about-card h3,
-    .experience-card h3 {
-        font-size: 20px;
-    }
-
-    .services-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-
-    .work-feed {
-        grid-template-columns: 1fr;
-    }
-
-    .tracking-steps {
-        grid-template-columns: repeat(2, 1fr);
     }
 
     .contact-wrapper {
@@ -1227,164 +1157,75 @@ img {
         gap: 30px;
     }
 
-    .footer-content {
-        grid-template-columns: repeat(2, 1fr);
-    }
 }
 
-
-/* =====================================================
-   MOBILE BREAKPOINT: 480px
-===================================================== */
+/* MOBILE (480px) */
 
 @media (max-width: 480px) {
 
-    .container {
-        width: 100%;
-        padding: 0 12px;
-    }
-
     .navbar-container {
-        min-height: 56px;
-        padding: 0 12px;
+        padding: 0 16px;
     }
 
     .logo {
         font-size: 20px;
     }
 
-    .menu-toggle {
-        font-size: 24px;
-        padding: 6px;
-    }
-
-    .main-nav a {
-        padding: 12px 16px;
-        font-size: 14px;
-    }
-
-    .login-btn {
-        margin: 8px 16px;
-        width: calc(100% - 32px);
-        padding: 10px 16px;
-        font-size: 13px;
-    }
-
-    .hero {
-        padding: 40px 0;
+    .hero-text {
+        max-width: 100%;
     }
 
     .hero h1 {
         font-size: clamp(28px, 7vw, 48px);
-        letter-spacing: -1px;
     }
 
     .hero h2 {
-        font-size: clamp(16px, 4vw, 22px);
-        margin-bottom: 16px;
-    }
-
-    .hero-tag {
-        font-size: 11px;
+        font-size: clamp(16px, 4vw, 24px);
     }
 
     .hero-description {
-        font-size: 14px;
-        margin-bottom: 20px;
+        font-size: 15px;
     }
 
     .hero-buttons {
-        flex-direction: column;
         gap: 10px;
     }
 
     .btn {
-        width: 100%;
+        padding: 10px 16px;
+        font-size: 13px;
         min-height: 44px;
-        padding: 12px 16px;
-        font-size: 14px;
     }
 
     .hero-image {
-        min-height: 280px;
-    }
-
-    .profile-frame {
-        width: min(240px, 85vw);
+        min-height: 320px;
     }
 
     .image-glow {
-        width: 220px;
-        height: 220px;
+        width: 250px;
+        height: 250px;
         filter: blur(60px);
     }
 
+    .profile-frame {
+        width: min(300px, 90vw);
+    }
+
     .section {
-        padding: 40px 0;
+        padding: 60px 0;
     }
 
     .section-heading {
-        margin-bottom: 30px;
-    }
-
-    .section-label {
-        font-size: 11px;
+        margin-bottom: 40px;
     }
 
     .section-title {
-        font-size: clamp(24px, 6vw, 32px);
-        margin-bottom: 12px;
-    }
-
-    .section-description {
-        font-size: 14px;
-    }
-
-    .about-grid {
-        gap: 16px;
+        font-size: clamp(24px, 5vw, 32px);
     }
 
     .about-card,
     .experience-card {
         padding: 20px;
-    }
-
-    .about-card h3,
-    .experience-card h3 {
-        font-size: 18px;
-        margin-bottom: 16px;
-    }
-
-    .about-card p {
-        font-size: 14px;
-        margin-bottom: 12px;
-    }
-
-    .experience-number {
-        width: 36px;
-        height: 36px;
-        font-size: 14px;
-    }
-
-    .experience-item h4 {
-        font-size: 15px;
-    }
-
-    .experience-item p {
-        font-size: 13px;
-    }
-
-    .skills-area {
-        padding: 20px;
-    }
-
-    .skills-list {
-        gap: 8px;
-    }
-
-    .skills-list span {
-        padding: 6px 12px;
-        font-size: 13px;
     }
 
     .services-grid {
@@ -1395,293 +1236,21 @@ img {
         padding: 20px;
     }
 
-    .service-number {
-        font-size: 28px;
-    }
-
-    .service-card h3 {
-        font-size: 18px;
-    }
-
-    .service-card > p {
-        font-size: 14px;
-    }
-
-    .service-info {
-        padding: 12px 0;
-        margin-bottom: 16px;
-    }
-
-    .service-info strong {
-        font-size: 16px;
-    }
-
-    .service-buttons {
-        gap: 8px;
-    }
-
-    .service-details-btn,
-    .service-order-btn {
-        font-size: 12px;
-        padding: 8px 12px;
-        min-height: 40px;
-    }
-
     .work-feed {
-        gap: 16px;
+        grid-template-columns: 1fr;
     }
 
     .work-post {
         border-radius: 12px;
     }
 
-    .post-header {
-        padding: 16px;
-        gap: 10px;
-    }
-
-    .post-avatar {
-        width: 40px;
-        height: 40px;
-        font-size: 16px;
-    }
-
-    .post-author h3 {
-        font-size: 14px;
-    }
-
-    .post-author span {
-        font-size: 12px;
-    }
-
-    .post-content {
-        padding: 16px;
-    }
-
-    .post-image-placeholder {
-        height: 150px;
-        font-size: 12px;
-        margin-bottom: 12px;
-    }
-
-    .post-content h3 {
-        font-size: 16px;
-    }
-
-    .post-content p {
-        font-size: 13px;
-    }
-
-    .post-actions {
-        padding: 12px 16px;
-        gap: 8px;
-    }
-
-    .post-actions button {
-        font-size: 12px;
-        padding: 6px;
-    }
-
-    .post-footer {
-        padding: 12px 16px;
-        gap: 8px;
-    }
-
-    .post-details-btn,
-    .post-order-btn {
-        font-size: 12px;
-        padding: 8px;
-        min-height: 36px;
-    }
-
-    .tracking-card {
-        padding: 20px;
-    }
-
-    .tracking-top {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 12px;
-    }
-
-    .tracking-status {
-        align-self: flex-start;
-    }
-
-    .tracking-steps {
-        grid-template-columns: 1fr;
-        gap: 10px;
-    }
-
-    .tracking-step {
-        padding: 12px;
-    }
-
-    .step-number {
-        width: 28px;
-        height: 28px;
-        font-size: 12px;
-    }
-
-    .step-info strong {
-        font-size: 13px;
-    }
-
-    .step-info p {
-        font-size: 11px;
-    }
-
-    .contact-wrapper {
-        grid-template-columns: 1fr;
-        gap: 20px;
-    }
-
-    .contact-form {
+    .contact-form,
+    .contact-info {
         gap: 16px;
     }
 
-    .form-group input,
-    .form-group select,
-    .form-group textarea {
-        padding: 10px 12px;
-        font-size: 13px;
-    }
-
-    .form-group textarea {
-        min-height: 100px;
-    }
-
-    .contact-info {
-        gap: 20px;
-    }
-
-    .info-item h4 {
-        font-size: 15px;
-    }
-
-    .info-item p {
-        font-size: 14px;
-    }
-
-    .social-links {
-        gap: 8px;
-    }
-
-    .social-links a {
-        padding: 6px 12px;
-        font-size: 12px;
-    }
-
     .footer-content {
-        grid-template-columns: 1fr;
         gap: 30px;
     }
 
-    .footer-section h3,
-    .footer-section h4 {
-        font-size: 14px;
-    }
-
-    .footer-section p,
-    .footer-section a {
-        font-size: 13px;
-    }
-
-    .footer-social {
-        gap: 8px;
-    }
-
-    .footer-social a {
-        width: 36px;
-        height: 36px;
-        font-size: 11px;
-    }
-
-    .footer-bottom {
-        font-size: 12px;
-    }
 }
-
-
-/* =====================================================
-   SMALL MOBILE: 360px
-===================================================== */
-
-@media (max-width: 360px) {
-
-    .container {
-        padding: 0 10px;
-    }
-
-    .navbar-container {
-        padding: 0 10px;
-    }
-
-    .logo {
-        font-size: 18px;
-    }
-
-    .hero h1 {
-        font-size: clamp(24px, 6vw, 40px);
-    }
-
-    .hero h2 {
-        font-size: clamp(14px, 3.5vw, 18px);
-    }
-
-    .hero-description {
-        font-size: 13px;
-    }
-
-    .profile-frame {
-        width: min(200px, 90vw);
-    }
-
-    .image-glow {
-        width: 180px;
-        height: 180px;
-        filter: blur(50px);
-    }
-
-    .section-title {
-        font-size: clamp(22px, 5vw, 28px);
-    }
-
-    .about-card h3,
-    .experience-card h3 {
-        font-size: 17px;
-    }
-
-    .service-number {
-        font-size: 24px;
-    }
-
-    .service-card h3 {
-        font-size: 16px;
-    }
-
-    .work-post {
-        border-radius: 10px;
-    }
-
-    .post-image-placeholder {
-        height: 120px;
-    }
-
-    .post-content h3 {
-        font-size: 15px;
-    }
-
-    .form-group label {
-        font-size: 13px;
-    }
-
-    .footer-section h3 {
-        font-size: 16px;
-    }
-
-    .footer-section h4 {
-        font-size: 13px;
-    }
-}
-
