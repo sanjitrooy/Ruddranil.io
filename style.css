@@ -755,112 +755,200 @@ img {
    PORTFOLIO / WORK FEED
 ===================================================== */
 
+.portfolio-section {
+    background:
+        radial-gradient(
+            circle at 80% 20%,
+            rgba(37, 99, 235, 0.06),
+            transparent 35%
+        ),
+        #0d1016;
+}
+
 .work-feed {
     margin-top: 60px;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    gap: 24px;
+    grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+    gap: 32px;
+    max-width: 1000px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .work-post {
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 16px;
-    background: rgba(255,255,255,0.025);
+    border: 1px solid rgba(96, 165, 250, 0.2);
+    border-radius: 18px;
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.05), rgba(96, 165, 250, 0.02));
     overflow: hidden;
-    transition: all 0.3s ease;
+    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    backdrop-filter: blur(6px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.work-post::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(96, 165, 250, 0.08), transparent);
+    transition: left 0.6s ease;
+    pointer-events: none;
+    z-index: 0;
 }
 
 .work-post:hover {
-    border-color: rgba(96,165,250,0.45);
-    background: rgba(96,165,250,0.06);
-    transform: translateY(-5px);
+    border-color: rgba(96, 165, 250, 0.4);
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.08), rgba(96, 165, 250, 0.04));
+    transform: translateY(-10px);
+    box-shadow: 0 20px 60px rgba(37, 99, 235, 0.25);
+}
+
+.work-post:hover::before {
+    left: 100%;
 }
 
 .post-header {
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 20px;
-    border-bottom: 1px solid rgba(255,255,255,0.08);
+    padding: 24px;
+    border-bottom: 1px solid rgba(96, 165, 250, 0.15);
+    position: relative;
+    z-index: 1;
 }
 
 .post-avatar {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 44px;
-    height: 44px;
+    width: 48px;
+    height: 48px;
     border-radius: 50%;
-    background: rgba(96, 165, 250, 0.15);
+    background: linear-gradient(135deg, rgba(96, 165, 250, 0.2), rgba(37, 99, 235, 0.1));
     color: #60a5fa;
     font-weight: 800;
-    font-size: 18px;
+    font-size: 20px;
     flex-shrink: 0;
+    border: 1px solid rgba(96, 165, 250, 0.25);
+    transition: all 0.25s ease;
+}
+
+.work-post:hover .post-avatar {
+    background: linear-gradient(135deg, rgba(96, 165, 250, 0.3), rgba(37, 99, 235, 0.15));
+    border-color: rgba(96, 165, 250, 0.4);
+}
+
+.post-author {
+    flex: 1;
 }
 
 .post-author h3 {
     color: #ffffff;
-    font-size: 15px;
+    font-size: 16px;
+    font-weight: 700;
     margin-bottom: 4px;
+    letter-spacing: -0.3px;
 }
 
 .post-author span {
-    color: #8b95a5;
+    color: #a0aab8;
     font-size: 13px;
+    font-weight: 500;
 }
 
 .post-content {
-    padding: 20px;
+    padding: 24px;
+    flex-grow: 1;
+    position: relative;
+    z-index: 1;
 }
 
 .post-image-placeholder {
     width: 100%;
-    height: 200px;
+    height: 220px;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, rgba(37,99,235,0.08), rgba(255,255,255,0.02));
-    border-radius: 12px;
-    margin-bottom: 16px;
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.12), rgba(96, 165, 250, 0.06));
+    border-radius: 14px;
+    margin-bottom: 20px;
     color: #64748b;
     font-size: 13px;
     font-weight: 700;
-    letter-spacing: 1px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    border: 1px solid rgba(96, 165, 250, 0.15);
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.work-post:hover .post-image-placeholder {
+    border-color: rgba(96, 165, 250, 0.3);
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.15), rgba(96, 165, 250, 0.08));
+    transform: scale(1.02);
 }
 
 .post-content h3 {
     color: #ffffff;
-    font-size: 18px;
-    margin-bottom: 10px;
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    line-height: 1.3;
+    letter-spacing: -0.3px;
 }
 
 .post-content p {
-    color: #9ca3af;
-    font-size: 14px;
-    line-height: 1.6;
+    color: #b4bcc4;
+    font-size: 15px;
+    line-height: 1.7;
 }
 
 .post-actions {
     display: flex;
-    gap: 12px;
-    padding: 16px 20px;
-    border-top: 1px solid rgba(255,255,255,0.08);
-    border-bottom: 1px solid rgba(255,255,255,0.08);
+    gap: 0;
+    padding: 16px 24px;
+    border-top: 1px solid rgba(96, 165, 250, 0.12);
+    border-bottom: 1px solid rgba(96, 165, 250, 0.12);
+    position: relative;
+    z-index: 1;
 }
 
 .post-actions button {
     flex: 1;
     background: transparent;
     border: none;
-    color: #9ca3af;
+    color: #a0aab8;
     font-size: 14px;
-    padding: 8px;
+    font-weight: 500;
+    padding: 8px 0;
     cursor: pointer;
-    transition: color 0.25s ease;
+    transition: all 0.25s ease;
+    position: relative;
+}
+
+.post-actions button::before {
+    content: "";
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: #60a5fa;
+    opacity: 0;
+    transition: opacity 0.25s ease;
 }
 
 .post-actions button:hover {
     color: #60a5fa;
+}
+
+.post-actions button:hover::before {
+    opacity: 1;
 }
 
 .post-actions button.liked {
@@ -870,26 +958,46 @@ img {
 .post-footer {
     display: flex;
     gap: 12px;
-    padding: 16px 20px;
+    padding: 20px 24px;
+    position: relative;
+    z-index: 1;
 }
 
 .post-details-btn,
 .post-order-btn {
     flex: 1;
-    font-size: 13px;
-    padding: 10px;
-    min-height: 40px;
+    font-size: 14px;
+    padding: 12px 16px;
+    min-height: 44px;
+    border-radius: 10px;
+    font-weight: 600;
+    transition: all 0.25s ease;
 }
 
 .post-details-btn {
-    background: transparent;
+    background: rgba(96, 165, 250, 0.1);
     border: 1px solid rgba(96, 165, 250, 0.3);
     color: #60a5fa;
 }
 
+.post-details-btn:hover {
+    background: rgba(96, 165, 250, 0.15);
+    border-color: rgba(96, 165, 250, 0.5);
+    transform: translateY(-2px);
+}
+
 .post-order-btn {
     background: #2563eb;
+    border: 1px solid rgba(37, 99, 235, 0.5);
     color: #ffffff;
+    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
+}
+
+.post-order-btn:hover {
+    background: #1d4ed8;
+    border-color: rgba(37, 99, 235, 0.8);
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px rgba(37, 99, 235, 0.4);
 }
 
 
@@ -1259,9 +1367,9 @@ footer p {
         min-height: 480px;
     }
 
-    .services-grid {
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-        gap: 24px;
+    .work-feed {
+        grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+        gap: 28px;
     }
 
     .contact-wrapper {
@@ -1309,17 +1417,9 @@ footer p {
         gap: 24px;
     }
 
-    .services-grid {
-        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-        gap: 20px;
-    }
-
-    .service-card {
-        padding: 32px 24px;
-    }
-
-    .service-buttons {
-        grid-template-columns: 1fr;
+    .work-feed {
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 24px;
     }
 
     .contact-wrapper {
@@ -1369,48 +1469,71 @@ footer p {
         font-size: 20px;
     }
 
-    .services-grid {
-        grid-template-columns: 1fr;
-        gap: 18px;
-    }
-
-    .service-card {
-        padding: 28px 20px;
-    }
-
-    .service-number {
-        font-size: 36px;
-    }
-
-    .service-card h3 {
-        font-size: 18px;
-        margin-bottom: 12px;
-    }
-
-    .service-card > p {
-        font-size: 14px;
-        margin-bottom: 20px;
-    }
-
-    .service-info {
-        grid-template-columns: 1fr;
-        gap: 16px;
-        padding: 20px 0;
-    }
-
-    .service-buttons {
-        gap: 10px;
-    }
-
-    .service-details-btn,
-    .service-order-btn {
-        padding: 11px 14px;
-        font-size: 13px;
-    }
-
     .work-feed {
         grid-template-columns: 1fr;
         gap: 20px;
+    }
+
+    .work-post {
+        border-radius: 16px;
+    }
+
+    .post-header {
+        padding: 20px;
+    }
+
+    .post-avatar {
+        width: 44px;
+        height: 44px;
+        font-size: 18px;
+    }
+
+    .post-author h3 {
+        font-size: 15px;
+    }
+
+    .post-author span {
+        font-size: 12px;
+    }
+
+    .post-content {
+        padding: 20px;
+    }
+
+    .post-image-placeholder {
+        height: 180px;
+        font-size: 12px;
+        margin-bottom: 16px;
+    }
+
+    .post-content h3 {
+        font-size: 18px;
+        margin-bottom: 10px;
+    }
+
+    .post-content p {
+        font-size: 14px;
+    }
+
+    .post-actions {
+        padding: 14px 20px;
+        gap: 0;
+    }
+
+    .post-actions button {
+        font-size: 13px;
+    }
+
+    .post-footer {
+        gap: 10px;
+        padding: 18px 20px;
+    }
+
+    .post-details-btn,
+    .post-order-btn {
+        padding: 11px 14px;
+        font-size: 13px;
+        min-height: 42px;
     }
 
     .contact-wrapper {
@@ -1436,16 +1559,6 @@ footer p {
 
     .tracking-steps {
         grid-template-columns: 1fr;
-    }
-
-    .post-footer {
-        gap: 10px;
-    }
-
-    .post-details-btn,
-    .post-order-btn {
-        min-height: 38px;
-        font-size: 12px;
     }
 
     .hero-buttons {
@@ -1488,22 +1601,48 @@ footer p {
         min-height: calc(100vh - 64px);
     }
 
-    .services-grid {
+    .work-feed {
         gap: 16px;
     }
 
-    .service-card {
-        padding: 24px 16px;
+    .work-post {
+        border-radius: 14px;
     }
 
-    .service-info {
-        padding: 16px 0;
+    .post-header {
+        padding: 18px;
     }
 
-    .service-details-btn,
-    .service-order-btn {
+    .post-avatar {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+    }
+
+    .post-content {
+        padding: 18px;
+    }
+
+    .post-image-placeholder {
+        height: 160px;
+        border-radius: 12px;
+        margin-bottom: 14px;
+    }
+
+    .post-actions {
+        padding: 12px 18px;
+    }
+
+    .post-footer {
+        gap: 8px;
+        padding: 16px 18px;
+    }
+
+    .post-details-btn,
+    .post-order-btn {
         padding: 10px 12px;
         min-height: 40px;
+        font-size: 12px;
     }
 
     .contact-item {
