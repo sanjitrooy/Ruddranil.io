@@ -1005,139 +1005,247 @@ img {
    WORK TRACKING
 ===================================================== */
 
+.tracking-section {
+    background:
+        radial-gradient(
+            circle at 50% 0%,
+            rgba(37, 99, 235, 0.08),
+            transparent 50%
+        ),
+        #0a0d12;
+}
+
 .tracking-card {
-    margin-top: 40px;
-    padding: 30px;
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 16px;
-    background: rgba(255,255,255,0.025);
+    margin-top: 60px;
+    padding: 40px;
+    border: 1px solid rgba(96, 165, 250, 0.25);
+    border-radius: 20px;
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.08), rgba(96, 165, 250, 0.04));
+    backdrop-filter: blur(10px);
+    box-shadow: 0 12px 48px rgba(37, 99, 235, 0.15);
+    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.tracking-card::before {
+    content: "";
+    position: absolute;
+    top: -1px;
+    left: -1px;
+    right: -1px;
+    bottom: -1px;
+    background: linear-gradient(135deg, rgba(96, 165, 250, 0.3), rgba(37, 99, 235, 0.15), transparent);
+    border-radius: 20px;
+    opacity: 0;
+    transition: opacity 0.35s ease;
+    pointer-events: none;
+    z-index: -1;
+}
+
+.tracking-card:hover {
+    border-color: rgba(96, 165, 250, 0.4);
+    box-shadow: 0 20px 70px rgba(37, 99, 235, 0.2);
+}
+
+.tracking-card:hover::before {
+    opacity: 1;
 }
 
 .tracking-top {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    margin-bottom: 30px;
-    padding-bottom: 20px;
-    border-bottom: 1px solid rgba(255,255,255,0.08);
+    align-items: flex-start;
+    margin-bottom: 36px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid rgba(96, 165, 250, 0.2);
+    gap: 20px;
+    flex-wrap: wrap;
 }
 
-.tracking-top div {
+.tracking-top > div:first-child {
     flex: 1;
+    min-width: 200px;
 }
 
 .tracking-label {
     display: block;
     color: #8b95a5;
-    font-size: 12px;
-    font-weight: 700;
+    font-size: 11px;
+    font-weight: 800;
     text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-bottom: 8px;
+    letter-spacing: 1.5px;
+    margin-bottom: 10px;
 }
 
 .tracking-top strong {
     display: block;
     color: #ffffff;
-    font-size: 18px;
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
 }
 
 .tracking-status {
-    padding: 8px 16px;
-    background: rgba(34, 197, 94, 0.1);
+    padding: 10px 20px;
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.15), rgba(34, 197, 94, 0.05));
     color: #22c55e;
-    border-radius: 20px;
+    border: 1px solid rgba(34, 197, 94, 0.3);
+    border-radius: 12px;
     font-size: 13px;
     font-weight: 700;
     text-align: center;
     white-space: nowrap;
+    text-transform: capitalize;
+    transition: all 0.25s ease;
+    letter-spacing: 0.3px;
+}
+
+.tracking-status:hover {
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.2), rgba(34, 197, 94, 0.08));
+    border-color: rgba(34, 197, 94, 0.5);
 }
 
 .progress-area {
-    margin-bottom: 30px;
+    margin-bottom: 36px;
 }
 
 .progress-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 12px;
+    margin-bottom: 14px;
+    gap: 12px;
 }
 
 .progress-header span {
-    color: #9ca3af;
+    color: #a0aab8;
     font-size: 14px;
+    font-weight: 600;
 }
 
 .progress-header strong {
     color: #60a5fa;
     font-weight: 800;
+    font-size: 16px;
 }
 
 .progress-bar {
     width: 100%;
-    height: 8px;
-    background: rgba(255,255,255,0.08);
-    border-radius: 10px;
+    height: 10px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
     overflow: hidden;
+    border: 1px solid rgba(96, 165, 250, 0.15);
+    position: relative;
 }
 
 .progress-fill {
     width: 60%;
     height: 100%;
-    background: linear-gradient(90deg, #60a5fa, #3b82f6);
-    border-radius: 10px;
+    background: linear-gradient(90deg, #60a5fa, #3b82f6, #2563eb);
+    border-radius: 12px;
+    animation: progressFill 2s ease-out;
+    box-shadow: 0 0 20px rgba(96, 165, 250, 0.5);
+}
+
+@keyframes progressFill {
+    from {
+        width: 0;
+    }
+    to {
+        width: 60%;
+    }
 }
 
 .tracking-steps {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: 12px;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 16px;
 }
 
 .tracking-step {
-    padding: 16px;
-    border: 2px solid rgba(255,255,255,0.08);
-    border-radius: 12px;
-    background: rgba(255,255,255,0.02);
+    padding: 24px 20px;
+    border: 1.5px solid rgba(96, 165, 250, 0.2);
+    border-radius: 14px;
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.05), rgba(96, 165, 250, 0.02));
     text-align: center;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.tracking-step::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(96, 165, 250, 0.1), transparent);
+    transition: left 0.5s ease;
+    pointer-events: none;
 }
 
 .tracking-step.completed {
-    border-color: rgba(34, 197, 94, 0.3);
-    background: rgba(34, 197, 94, 0.05);
+    border-color: rgba(34, 197, 94, 0.35);
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.08), rgba(34, 197, 94, 0.03));
+    box-shadow: 0 0 20px rgba(34, 197, 94, 0.1);
+}
+
+.tracking-step.completed .step-number {
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.25), rgba(34, 197, 94, 0.1));
+    color: #22c55e;
+    border-color: rgba(34, 197, 94, 0.4);
+}
+
+.tracking-step:hover {
+    border-color: rgba(96, 165, 250, 0.4);
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.08), rgba(96, 165, 250, 0.04));
+    transform: translateY(-4px);
+    box-shadow: 0 8px 28px rgba(37, 99, 235, 0.15);
+}
+
+.tracking-step:hover::before {
+    left: 100%;
 }
 
 .step-number {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 32px;
-    height: 32px;
-    margin: 0 auto 8px;
-    border-radius: 50%;
-    background: rgba(96, 165, 250, 0.1);
+    width: 48px;
+    height: 48px;
+    margin: 0 auto 14px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, rgba(96, 165, 250, 0.15), rgba(37, 99, 235, 0.08));
     color: #60a5fa;
     font-weight: 800;
-    font-size: 14px;
+    font-size: 18px;
+    border: 1.5px solid rgba(96, 165, 250, 0.25);
+    transition: all 0.25s ease;
+    letter-spacing: -0.3px;
 }
 
-.tracking-step.completed .step-number {
-    background: rgba(34, 197, 94, 0.2);
-    color: #22c55e;
+.tracking-step:hover .step-number {
+    background: linear-gradient(135deg, rgba(96, 165, 250, 0.25), rgba(37, 99, 235, 0.12));
+    border-color: rgba(96, 165, 250, 0.4);
+    transform: scale(1.08);
 }
 
 .step-info strong {
     display: block;
     color: #ffffff;
-    font-size: 14px;
-    margin-bottom: 6px;
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    letter-spacing: -0.3px;
 }
 
 .step-info p {
-    color: #8b95a5;
-    font-size: 12px;
-    line-height: 1.4;
+    color: #a0aab8;
+    font-size: 13px;
+    line-height: 1.5;
 }
 
 
@@ -1375,6 +1483,15 @@ footer p {
     .contact-wrapper {
         gap: 32px;
     }
+
+    .tracking-card {
+        padding: 32px;
+    }
+
+    .tracking-steps {
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 14px;
+    }
 }
 
 @media (max-width: 968px) {
@@ -1429,6 +1546,11 @@ footer p {
 
     .tracking-steps {
         grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+
+    .tracking-top {
+        gap: 16px;
     }
 }
 
@@ -1554,11 +1676,55 @@ footer p {
     }
 
     .tracking-card {
-        padding: 24px;
+        margin-top: 40px;
+        padding: 28px 24px;
+    }
+
+    .tracking-top {
+        flex-direction: column;
+        gap: 16px;
+        margin-bottom: 28px;
+    }
+
+    .tracking-top > div:first-child {
+        width: 100%;
+    }
+
+    .tracking-status {
+        width: 100%;
+    }
+
+    .progress-area {
+        margin-bottom: 28px;
+    }
+
+    .progress-bar {
+        height: 8px;
     }
 
     .tracking-steps {
         grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .tracking-step {
+        padding: 20px 16px;
+    }
+
+    .step-number {
+        width: 44px;
+        height: 44px;
+        font-size: 16px;
+        margin-bottom: 12px;
+    }
+
+    .step-info strong {
+        font-size: 14px;
+        margin-bottom: 6px;
+    }
+
+    .step-info p {
+        font-size: 12px;
     }
 
     .hero-buttons {
@@ -1653,5 +1819,59 @@ footer p {
         width: 40px;
         height: 40px;
         font-size: 16px;
+    }
+
+    .tracking-card {
+        margin-top: 32px;
+        padding: 20px 16px;
+    }
+
+    .tracking-top {
+        margin-bottom: 24px;
+        padding-bottom: 20px;
+    }
+
+    .tracking-label {
+        font-size: 10px;
+    }
+
+    .tracking-top strong {
+        font-size: 20px;
+    }
+
+    .tracking-status {
+        padding: 8px 16px;
+        font-size: 12px;
+    }
+
+    .progress-header {
+        margin-bottom: 12px;
+    }
+
+    .progress-header span {
+        font-size: 13px;
+    }
+
+    .progress-header strong {
+        font-size: 14px;
+    }
+
+    .progress-area {
+        margin-bottom: 24px;
+    }
+
+    .tracking-steps {
+        gap: 10px;
+    }
+
+    .tracking-step {
+        padding: 16px 12px;
+    }
+
+    .step-number {
+        width: 40px;
+        height: 40px;
+        font-size: 14px;
+        margin-bottom: 10px;
     }
 }
