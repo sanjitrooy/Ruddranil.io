@@ -1,0 +1,547 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#080d19">
+  <title>Login | Ruddranil.io</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      font-family: Arial, sans-serif;
+      color: #f8fafc;
+      background:
+        radial-gradient(ellipse at top left, #153c55 0, transparent 45%),
+        radial-gradient(ellipse at bottom right, #30205c 0, transparent 40%),
+        #080d19;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+
+    .login-container {
+      width: 100%;
+      max-width: 440px;
+    }
+
+    .brand {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .brand a {
+      color: #fff;
+      font-size: 27px;
+      font-weight: 800;
+      text-decoration: none;
+    }
+
+    .brand span {
+      color: #60a5fa;
+    }
+
+    .brand p {
+      color: #a8b3c7;
+      margin-top: 9px;
+      font-size: 14px;
+    }
+
+    .login-card {
+      background: rgba(17, 25, 43, 0.92);
+      border: 1px solid rgba(148, 163, 184, 0.22);
+      border-radius: 22px;
+      padding: 32px;
+      box-shadow: 0 24px 80px rgba(0, 0, 0, 0.35);
+    }
+
+    h1 {
+      font-size: 28px;
+      margin-bottom: 10px;
+    }
+
+    .subtitle {
+      color: #a8b3c7;
+      font-size: 14px;
+      line-height: 1.6;
+      margin-bottom: 26px;
+    }
+
+    .field {
+      margin-bottom: 18px;
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 9px;
+    }
+
+    input {
+      width: 100%;
+      padding: 14px;
+      border: 1px solid #344158;
+      border-radius: 10px;
+      background: #0b1220;
+      color: #fff;
+      font-size: 15px;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: #60a5fa;
+      box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.12);
+    }
+
+    input::placeholder {
+      color: #77849b;
+    }
+
+    .password-wrap {
+      display: flex;
+      gap: 8px;
+    }
+
+    .password-wrap input {
+      min-width: 0;
+    }
+
+    .show-password {
+      border: 1px solid #344158;
+      background: #182338;
+      color: #dbeafe;
+      padding: 0 12px;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    .options {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin: 4px 0 22px;
+      font-size: 13px;
+    }
+
+    .remember {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      color: #cbd5e1;
+    }
+
+    .remember input {
+      width: 15px;
+      height: 15px;
+      accent-color: #60a5fa;
+    }
+
+    a {
+      color: #93c5fd;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .primary-btn {
+      width: 100%;
+      border: none;
+      border-radius: 10px;
+      padding: 15px;
+      color: #07111f;
+      background: linear-gradient(100deg, #60a5fa, #67e8f9);
+      font-size: 15px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: transform .2s, opacity .2s;
+    }
+
+    .primary-btn:hover {
+      transform: translateY(-2px);
+    }
+
+    .primary-btn:disabled {
+      opacity: .6;
+      cursor: wait;
+      transform: none;
+    }
+
+    .switch {
+      text-align: center;
+      margin-top: 23px;
+      color: #a8b3c7;
+      font-size: 14px;
+    }
+
+    .message {
+      display: none;
+      margin-bottom: 18px;
+      padding: 12px;
+      border-radius: 9px;
+      font-size: 13px;
+      line-height: 1.6;
+      overflow-wrap: anywhere;
+    }
+
+    .message.show {
+      display: block;
+    }
+
+    .message.error {
+      background: #451a24;
+      color: #fecdd3;
+    }
+
+    .message.success {
+      background: #123629;
+      color: #bbf7d0;
+    }
+
+    .back-home {
+      display: block;
+      text-align: center;
+      margin-top: 22px;
+      color: #cbd5e1;
+      font-size: 14px;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    @media (max-width: 480px) {
+      .login-card {
+        padding: 25px 20px;
+      }
+
+      h1 {
+        font-size: 25px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="login-container">
+    <div class="brand">
+      <a href="./index.html">Ruddranil<span>.io</span></a>
+      <p>Your professional digital space</p>
+    </div>
+
+    <section class="login-card">
+      <h1 id="formTitle">Welcome back 👋</h1>
+      <p class="subtitle" id="formSubtitle">
+        Sign in to access your account and manage your projects.
+      </p>
+
+      <div id="message" class="message" role="status"
+           aria-live="polite"></div>
+
+      <form id="authForm">
+        <div class="field hidden" id="nameField">
+          <label for="fullName">Full name</label>
+          <input id="fullName" type="text"
+                 autocomplete="name" placeholder="Your full name">
+        </div>
+
+        <div class="field">
+          <label for="email">Email address</label>
+          <input id="email" type="email" autocomplete="email"
+                 placeholder="you@example.com" required>
+        </div>
+
+        <div class="field">
+          <label for="password">Password</label>
+          <div class="password-wrap">
+            <input id="password" type="password"
+                   autocomplete="current-password"
+                   placeholder="Enter your password"
+                   minlength="6" required>
+            <button type="button" class="show-password"
+                    id="togglePassword">Show</button>
+          </div>
+        </div>
+
+        <div class="options" id="loginOptions">
+          <label class="remember">
+            <input type="checkbox" id="rememberMe">
+            Remember email
+          </label>
+          <a href="#" id="forgotPassword">Forgot password?</a>
+        </div>
+
+        <button type="submit" class="primary-btn" id="submitBtn">
+          Sign In
+        </button>
+      </form>
+
+      <p class="switch">
+        <span id="switchText">Don't have an account?</span>
+        <a href="#" id="switchMode">Create account</a>
+      </p>
+    </section>
+
+    <a class="back-home" href="./index.html">
+      ← Back to Home
+    </a>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <script>
+    // Add your existing Supabase project credentials here.
+    const SUPABASE_URL =
+      "https://wvjehxwrxhaweeuyoutg.supabase.co";
+
+    const SUPABASE_PUBLISHABLE_KEY =
+      "PASTE_YOUR_SUPABASE_PUBLISHABLE_KEY_HERE";
+
+    const authForm = document.getElementById("authForm");
+    const messageBox = document.getElementById("message");
+    const submitBtn = document.getElementById("submitBtn");
+    const emailInput = document.getElementById("email");
+    const passwordInput = document.getElementById("password");
+    const nameInput = document.getElementById("fullName");
+    const nameField = document.getElementById("nameField");
+    const loginOptions = document.getElementById("loginOptions");
+    const rememberMe = document.getElementById("rememberMe");
+    const switchMode = document.getElementById("switchMode");
+    const forgotPassword = document.getElementById("forgotPassword");
+
+    let isSignup = false;
+    let supabaseClient = null;
+
+    function showMessage(text, type = "error") {
+      messageBox.textContent = text;
+      messageBox.className = "message show " + type;
+    }
+
+    function clearMessage() {
+      messageBox.textContent = "";
+      messageBox.className = "message";
+    }
+
+    function initializeAuth() {
+      if (!window.supabase) {
+        showMessage("Authentication library failed to load. Check your internet connection.");
+        return false;
+      }
+
+      if (
+        !SUPABASE_URL.startsWith("https://") ||
+        SUPABASE_PUBLISHABLE_KEY.includes("PASTE_YOUR_")
+      ) {
+        showMessage("Setup required: add your Supabase publishable key in login.html.");
+        return false;
+      }
+
+      if (!supabaseClient) {
+        supabaseClient = window.supabase.createClient(
+          SUPABASE_URL,
+          SUPABASE_PUBLISHABLE_KEY,
+          {
+            auth: {
+              persistSession: true,
+              autoRefreshToken: true,
+              detectSessionInUrl: true
+            }
+          }
+        );
+      }
+
+      return true;
+    }
+
+    function setMode(signup) {
+      isSignup = signup;
+      clearMessage();
+
+      document.getElementById("formTitle").textContent =
+        signup ? "Create your account" : "Welcome back 👋";
+
+      document.getElementById("formSubtitle").textContent =
+        signup
+          ? "Register to access your personal account."
+          : "Sign in to access your account and manage your projects.";
+
+      nameField.classList.toggle("hidden", !signup);
+      nameInput.required = signup;
+      loginOptions.classList.toggle("hidden", signup);
+
+      passwordInput.autocomplete =
+        signup ? "new-password" : "current-password";
+
+      submitBtn.textContent =
+        signup ? "Create Account" : "Sign In";
+
+      document.getElementById("switchText").textContent =
+        signup ? "Already have an account?" : "Don't have an account?";
+
+      switchMode.textContent =
+        signup ? "Sign in" : "Create account";
+    }
+
+    switchMode.addEventListener("click", (event) => {
+      event.preventDefault();
+      setMode(!isSignup);
+    });
+
+    document.getElementById("togglePassword")
+      .addEventListener("click", () => {
+        const showing = passwordInput.type === "text";
+        passwordInput.type = showing ? "password" : "text";
+        document.getElementById("togglePassword").textContent =
+          showing ? "Show" : "Hide";
+      });
+
+    // Save email only; never save the password.
+    const savedEmail = localStorage.getItem("ruddranilRememberedEmail");
+    if (savedEmail) {
+      emailInput.value = savedEmail;
+      rememberMe.checked = true;
+    }
+
+    rememberMe.addEventListener("change", () => {
+      if (rememberMe.checked && emailInput.value.trim()) {
+        localStorage.setItem(
+          "ruddranilRememberedEmail",
+          emailInput.value.trim()
+        );
+      } else {
+        localStorage.removeItem("ruddranilRememberedEmail");
+      }
+    });
+
+    emailInput.addEventListener("input", () => {
+      if (rememberMe.checked) {
+        localStorage.setItem(
+          "ruddranilRememberedEmail",
+          emailInput.value.trim()
+        );
+      }
+    });
+
+    forgotPassword.addEventListener("click", async (event) => {
+      event.preventDefault();
+      clearMessage();
+
+      if (!initializeAuth()) return;
+
+      const email = emailInput.value.trim();
+      if (!email) {
+        showMessage("Enter your email address first.");
+        emailInput.focus();
+        return;
+      }
+
+      submitBtn.disabled = true;
+
+      try {
+        const redirectTo = new URL("./login.html", window.location.href).href;
+
+        const { error } = await supabaseClient.auth.resetPasswordForEmail(
+          email,
+          { redirectTo }
+        );
+
+        if (error) throw error;
+
+        showMessage(
+          "If the email is registered, password reset instructions will be sent. Check your inbox.",
+          "success"
+        );
+      } catch (error) {
+        showMessage(error.message || "Could not request a password reset.");
+      } finally {
+        submitBtn.disabled = false;
+      }
+    });
+
+    authForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      clearMessage();
+
+      if (!initializeAuth()) return;
+
+      const email = emailInput.value.trim();
+      const password = passwordInput.value;
+      const fullName = nameInput.value.trim();
+
+      if (!email || !password) {
+        showMessage("Enter your email and password.");
+        return;
+      }
+
+      if (isSignup && !fullName) {
+        showMessage("Please enter your full name.");
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = isSignup ? "Creating account..." : "Signing in...";
+
+      try {
+        if (isSignup) {
+          const { data, error } = await supabaseClient.auth.signUp({
+            email,
+            password,
+            options: {
+              data: { full_name: fullName },
+              emailRedirectTo:
+                new URL("./login.html", window.location.href).href
+            }
+          });
+
+          if (error) throw error;
+
+          if (data.session) {
+            showMessage(
+              "Account created successfully. Your dashboard will be connected in the next step.",
+              "success"
+            );
+          } else {
+            showMessage(
+              "Registration submitted. Check your email to confirm your account before signing in.",
+              "success"
+            );
+          }
+        } else {
+          const { error } = await supabaseClient.auth.signInWithPassword({
+            email,
+            password
+          });
+
+          if (error) throw error;
+
+          if (rememberMe.checked) {
+            localStorage.setItem("ruddranilRememberedEmail", email);
+          } else {
+            localStorage.removeItem("ruddranilRememberedEmail");
+          }
+
+          showMessage(
+            "Login successful! Your account is verified. Next, we will connect your dashboard.",
+            "success"
+          );
+        }
+      } catch (error) {
+        showMessage(error.message || "Something went wrong. Please try again.");
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = isSignup ? "Create Account" : "Sign In";
+      }
+    });
+  </script>
+</body>
+</html>
