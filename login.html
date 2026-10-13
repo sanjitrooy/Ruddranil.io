@@ -1,192 +1,186 @@
-
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#080d19">
-  <title>Login | Ruddranil.io</title>
+  <meta name="theme-color" content="#101827">
+  <title>Customer Login | Ruddranil.io</title>
 
   <style>
     * {
-      box-sizing: border-box;
       margin: 0;
       padding: 0;
+      box-sizing: border-box;
     }
 
     body {
       min-height: 100vh;
-      font-family: Arial, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+      font-family: Arial, Helvetica, sans-serif;
       color: #f8fafc;
       background:
-        radial-gradient(ellipse at top left, #153c55 0, transparent 45%),
-        radial-gradient(ellipse at bottom right, #30205c 0, transparent 40%),
-        #080d19;
-      display: grid;
-      place-items: center;
-      padding: 24px;
+        radial-gradient(circle at top left, #173d54, transparent 45%),
+        linear-gradient(135deg, #0b1120, #111827 55%, #071c2d);
     }
 
-    .login-container {
+    .auth-card {
       width: 100%;
       max-width: 440px;
+      padding: 32px;
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      border-radius: 22px;
+      background: rgba(17, 24, 39, 0.94);
+      box-shadow: 0 24px 70px rgba(0, 0, 0, 0.4);
     }
 
     .brand {
       text-align: center;
-      margin-bottom: 24px;
-    }
-
-    .brand a {
-      color: #fff;
-      font-size: 27px;
-      font-weight: 800;
-      text-decoration: none;
-    }
-
-    .brand span {
-      color: #60a5fa;
-    }
-
-    .brand p {
-      color: #a8b3c7;
-      margin-top: 9px;
-      font-size: 14px;
-    }
-
-    .login-card {
-      background: rgba(17, 25, 43, 0.92);
-      border: 1px solid rgba(148, 163, 184, 0.22);
-      border-radius: 22px;
-      padding: 32px;
-      box-shadow: 0 24px 80px rgba(0, 0, 0, 0.35);
-    }
-
-    h1 {
-      font-size: 28px;
-      margin-bottom: 10px;
-    }
-
-    .subtitle {
-      color: #a8b3c7;
-      font-size: 14px;
-      line-height: 1.6;
       margin-bottom: 26px;
     }
 
-    .field {
-      margin-bottom: 18px;
+    .brand-icon {
+      width: 58px;
+      height: 58px;
+      display: grid;
+      place-items: center;
+      margin: 0 auto 14px;
+      border-radius: 18px;
+      color: white;
+      font-size: 25px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #06b6d4, #2563eb);
     }
 
-    label {
-      display: block;
-      font-size: 13px;
-      font-weight: 600;
-      margin-bottom: 9px;
+    .brand h1 {
+      font-size: 25px;
+      margin-bottom: 8px;
     }
 
-    input {
-      width: 100%;
-      padding: 14px;
-      border: 1px solid #344158;
-      border-radius: 10px;
+    .brand p {
+      color: #94a3b8;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      padding: 5px;
+      margin-bottom: 24px;
+      border-radius: 12px;
       background: #0b1220;
-      color: #fff;
-      font-size: 15px;
-      outline: none;
     }
 
-    input:focus {
-      border-color: #60a5fa;
-      box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.12);
-    }
-
-    input::placeholder {
-      color: #77849b;
-    }
-
-    .password-wrap {
-      display: flex;
-      gap: 8px;
-    }
-
-    .password-wrap input {
-      min-width: 0;
-    }
-
-    .show-password {
-      border: 1px solid #344158;
-      background: #182338;
-      color: #dbeafe;
-      padding: 0 12px;
-      border-radius: 10px;
+    .tab {
+      padding: 12px 8px;
+      border: 0;
+      border-radius: 9px;
+      color: #94a3b8;
+      background: transparent;
+      font-size: 14px;
+      font-weight: 700;
       cursor: pointer;
     }
 
-    .options {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      margin: 4px 0 22px;
+    .tab.active {
+      color: white;
+      background: #2563eb;
+    }
+
+    .form-title {
+      font-size: 21px;
+      margin-bottom: 8px;
+    }
+
+    .form-description {
+      margin-bottom: 22px;
+      color: #94a3b8;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .field {
+      margin-bottom: 16px;
+    }
+
+    .field label {
+      display: block;
+      margin-bottom: 8px;
+      color: #dbeafe;
       font-size: 13px;
+      font-weight: 600;
     }
 
-    .remember {
-      display: flex;
-      align-items: center;
-      gap: 7px;
-      color: #cbd5e1;
+    .field input {
+      width: 100%;
+      padding: 13px 14px;
+      border: 1px solid #334155;
+      border-radius: 10px;
+      outline: none;
+      color: white;
+      background: #0b1220;
+      font-size: 15px;
+      transition: border-color 0.2s;
     }
 
-    .remember input {
-      width: 15px;
-      height: 15px;
-      accent-color: #60a5fa;
+    .field input:focus {
+      border-color: #38bdf8;
     }
 
-    a {
-      color: #93c5fd;
-      text-decoration: none;
-    }
-
-    a:hover {
-      text-decoration: underline;
+    .field input::placeholder {
+      color: #64748b;
     }
 
     .primary-btn {
       width: 100%;
-      border: none;
+      padding: 14px;
+      border: 0;
       border-radius: 10px;
-      padding: 15px;
-      color: #07111f;
-      background: linear-gradient(100deg, #60a5fa, #67e8f9);
+      color: white;
+      background: linear-gradient(90deg, #2563eb, #0891b2);
       font-size: 15px;
-      font-weight: 800;
+      font-weight: 700;
       cursor: pointer;
-      transition: transform .2s, opacity .2s;
+      transition: opacity 0.2s;
     }
 
     .primary-btn:hover {
-      transform: translateY(-2px);
+      opacity: 0.9;
     }
 
     .primary-btn:disabled {
-      opacity: .6;
+      opacity: 0.55;
       cursor: wait;
-      transform: none;
     }
 
-    .switch {
-      text-align: center;
-      margin-top: 23px;
-      color: #a8b3c7;
-      font-size: 14px;
+    .forgot-row {
+      margin: -2px 0 18px;
+      text-align: right;
+    }
+
+    .text-btn,
+    .back-link {
+      border: 0;
+      color: #38bdf8;
+      background: transparent;
+      font-size: 13px;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .text-btn:hover,
+    .back-link:hover {
+      text-decoration: underline;
     }
 
     .message {
       display: none;
-      margin-bottom: 18px;
+      margin-top: 16px;
       padding: 12px;
       border-radius: 9px;
       font-size: 13px;
@@ -198,132 +192,238 @@
       display: block;
     }
 
-    .message.error {
-      background: #451a24;
-      color: #fecdd3;
+    .message.success {
+      color: #bbf7d0;
+      background: rgba(22, 163, 74, 0.15);
+      border: 1px solid rgba(74, 222, 128, 0.25);
     }
 
-    .message.success {
-      background: #123629;
-      color: #bbf7d0;
+    .message.error {
+      color: #fecaca;
+      background: rgba(220, 38, 38, 0.12);
+      border: 1px solid rgba(248, 113, 113, 0.25);
+    }
+
+    .footer {
+      margin-top: 24px;
+      text-align: center;
+      color: #64748b;
+      font-size: 12px;
+      line-height: 1.8;
     }
 
     .back-home {
-      display: block;
-      text-align: center;
-      margin-top: 22px;
+      display: inline-block;
+      margin-top: 12px;
       color: #cbd5e1;
-      font-size: 14px;
+      font-size: 13px;
+      text-decoration: none;
+    }
+
+    .back-home:hover {
+      color: #38bdf8;
     }
 
     .hidden {
-      display: none;
+      display: none !important;
     }
 
     @media (max-width: 480px) {
-      .login-card {
-        padding: 25px 20px;
+      .auth-card {
+        padding: 24px 20px;
+        border-radius: 18px;
       }
 
-      h1 {
-        font-size: 25px;
+      .brand h1 {
+        font-size: 23px;
       }
     }
   </style>
 </head>
 
 <body>
-  <main class="login-container">
-    <div class="brand">
-      <a href="./index.html">Ruddranil<span>.io</span></a>
-      <p>Your professional digital space</p>
+  <main class="auth-card">
+    <header class="brand">
+      <div class="brand-icon">R</div>
+      <h1>Ruddranil.io</h1>
+      <p>Your account for projects and digital services</p>
+    </header>
+
+    <div class="tabs" id="authTabs">
+      <button type="button" class="tab active" id="loginTab">
+        Login
+      </button>
+      <button type="button" class="tab" id="signupTab">
+        Create Account
+      </button>
     </div>
 
-    <section class="login-card">
-      <h1 id="formTitle">Welcome back 👋</h1>
-      <p class="subtitle" id="formSubtitle">
-        Sign in to access your account and manage your projects.
+    <!-- LOGIN FORM -->
+    <section id="loginSection">
+      <h2 class="form-title">Welcome Back!</h2>
+      <p class="form-description">
+        Sign in to manage your account and orders.
       </p>
 
-      <div id="message" class="message" role="status"
-           aria-live="polite"></div>
-
-      <form id="authForm">
-        <div class="field hidden" id="nameField">
-          <label for="fullName">Full name</label>
-          <input id="fullName" type="text"
-                 autocomplete="name" placeholder="Your full name">
+      <form id="loginForm">
+        <div class="field">
+          <label for="loginEmail">Email Address</label>
+          <input
+            type="email"
+            id="loginEmail"
+            placeholder="you@example.com"
+            autocomplete="email"
+            required
+          >
         </div>
 
         <div class="field">
-          <label for="email">Email address</label>
-          <input id="email" type="email" autocomplete="email"
-                 placeholder="you@example.com" required>
+          <label for="loginPassword">Password</label>
+          <input
+            type="password"
+            id="loginPassword"
+            placeholder="Enter your password"
+            autocomplete="current-password"
+            required
+          >
         </div>
 
-        <div class="field">
-          <label for="password">Password</label>
-          <div class="password-wrap">
-            <input id="password" type="password"
-                   autocomplete="current-password"
-                   placeholder="Enter your password"
-                   minlength="6" required>
-            <button type="button" class="show-password"
-                    id="togglePassword">Show</button>
-          </div>
+        <div class="forgot-row">
+          <button type="button" class="text-btn" id="forgotBtn">
+            Forgot Password?
+          </button>
         </div>
 
-        <div class="options" id="loginOptions">
-          <label class="remember">
-            <input type="checkbox" id="rememberMe">
-            Remember email
-          </label>
-          <a href="#" id="forgotPassword">Forgot password?</a>
-        </div>
-
-        <button type="submit" class="primary-btn" id="submitBtn">
+        <button type="submit" class="primary-btn" id="loginSubmit">
           Sign In
         </button>
       </form>
+    </section>
 
-      <p class="switch">
-        <span id="switchText">Don't have an account?</span>
-        <a href="#" id="switchMode">Create account</a>
+    <!-- SIGNUP FORM -->
+    <section id="signupSection" class="hidden">
+      <h2 class="form-title">Create Your Account</h2>
+      <p class="form-description">
+        Register to submit requests and manage your projects.
+      </p>
+
+      <form id="signupForm">
+        <div class="field">
+          <label for="signupName">Full Name</label>
+          <input
+            type="text"
+            id="signupName"
+            placeholder="Enter your full name"
+            autocomplete="name"
+            maxlength="100"
+            required
+          >
+        </div>
+
+        <div class="field">
+          <label for="signupEmail">Email Address</label>
+          <input
+            type="email"
+            id="signupEmail"
+            placeholder="you@example.com"
+            autocomplete="email"
+            required
+          >
+        </div>
+
+        <div class="field">
+          <label for="signupPassword">Create Password</label>
+          <input
+            type="password"
+            id="signupPassword"
+            placeholder="At least 6 characters"
+            autocomplete="new-password"
+            minlength="6"
+            required
+          >
+        </div>
+
+        <div class="field">
+          <label for="confirmPassword">Confirm Password</label>
+          <input
+            type="password"
+            id="confirmPassword"
+            placeholder="Enter password again"
+            autocomplete="new-password"
+            minlength="6"
+            required
+          >
+        </div>
+
+        <button type="submit" class="primary-btn" id="signupSubmit">
+          Create Account
+        </button>
+      </form>
+    </section>
+
+    <!-- FORGOT PASSWORD -->
+    <section id="resetSection" class="hidden">
+      <h2 class="form-title">Reset Password</h2>
+      <p class="form-description">
+        Enter your registered email to receive a password reset link.
+      </p>
+
+      <form id="resetForm">
+        <div class="field">
+          <label for="resetEmail">Email Address</label>
+          <input
+            type="email"
+            id="resetEmail"
+            placeholder="you@example.com"
+            autocomplete="email"
+            required
+          >
+        </div>
+
+        <button type="submit" class="primary-btn" id="resetSubmit">
+          Send Reset Link
+        </button>
+      </form>
+
+      <p style="text-align:center; margin-top:18px;">
+        <button type="button" class="text-btn" id="backToLogin">
+          Back to Login
+        </button>
       </p>
     </section>
 
-    <a class="back-home" href="./index.html">
-      ← Back to Home
-    </a>
+    <div id="authMessage" class="message" role="status" aria-live="polite"></div>
+
+    <footer class="footer">
+      Secure customer authentication powered by Supabase.
+      <br>
+      <a href="index.html" class="back-home">← Back to Website</a>
+    </footer>
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <script>
-    // Add your existing Supabase project credentials here.
+    // IMPORTANT:
+    // Use the URL and publishable key from the SAME Supabase project.
     const SUPABASE_URL =
-      "https://udvvhqjgotwvqfjnfnrn.supabase.co";
+     "https://udvvhqjgotwvqfjnfnrn.supabase.co";
 
     const SUPABASE_PUBLISHABLE_KEY =
       "sb_publishable_oiH3zhFQpyVyxqrlvtRmOA_jPeFsdLV";
 
-    const authForm = document.getElementById("authForm");
-    const messageBox = document.getElementById("message");
-    const submitBtn = document.getElementById("submitBtn");
-    const emailInput = document.getElementById("email");
-    const passwordInput = document.getElementById("password");
-    const nameInput = document.getElementById("fullName");
-    const nameField = document.getElementById("nameField");
-    const loginOptions = document.getElementById("loginOptions");
-    const rememberMe = document.getElementById("rememberMe");
-    const switchMode = document.getElementById("switchMode");
-    const forgotPassword = document.getElementById("forgotPassword");
+    const messageBox = document.getElementById("authMessage");
+    const loginSection = document.getElementById("loginSection");
+    const signupSection = document.getElementById("signupSection");
+    const resetSection = document.getElementById("resetSection");
+    const loginTab = document.getElementById("loginTab");
+    const signupTab = document.getElementById("signupTab");
+    const authTabs = document.getElementById("authTabs");
 
-    let isSignup = false;
     let supabaseClient = null;
 
-    function showMessage(text, type = "error") {
-      messageBox.textContent = text;
+    function showMessage(message, type = "error") {
+      messageBox.textContent = message;
       messageBox.className = "message show " + type;
     }
 
@@ -332,216 +432,199 @@
       messageBox.className = "message";
     }
 
-    function initializeAuth() {
-      if (!window.supabase) {
-        showMessage("Authentication library failed to load. Check your internet connection.");
-        return false;
+    function showSection(section) {
+      clearMessage();
+
+      loginSection.classList.toggle("hidden", section !== "login");
+      signupSection.classList.toggle("hidden", section !== "signup");
+      resetSection.classList.toggle("hidden", section !== "reset");
+      authTabs.classList.toggle("hidden", section === "reset");
+
+      loginTab.classList.toggle("active", section === "login");
+      signupTab.classList.toggle("active", section === "signup");
+    }
+
+    function setLoading(button, loading, label) {
+      button.disabled = loading;
+      button.textContent = loading ? "Please wait..." : label;
+    }
+
+    function getClient() {
+      if (!window.supabase || !window.supabase.createClient) {
+        throw new Error(
+          "Authentication library could not load. Check your internet connection and refresh the page."
+        );
       }
 
       if (
         !SUPABASE_URL.startsWith("https://") ||
         SUPABASE_PUBLISHABLE_KEY.includes("PASTE_YOUR_")
       ) {
-        showMessage("Setup required: add your Supabase publishable key in login.html.");
-        return false;
+        throw new Error(
+          "Setup required: add the publishable key from your current Supabase project."
+        );
       }
 
       if (!supabaseClient) {
         supabaseClient = window.supabase.createClient(
           SUPABASE_URL,
-          SUPABASE_PUBLISHABLE_KEY,
-          {
-            auth: {
-              persistSession: true,
-              autoRefreshToken: true,
-              detectSessionInUrl: true
-            }
-          }
+          SUPABASE_PUBLISHABLE_KEY
         );
       }
 
-      return true;
+      return supabaseClient;
     }
 
-    function setMode(signup) {
-      isSignup = signup;
-      clearMessage();
+    // Switch between Login and Create Account.
+    loginTab.addEventListener("click", () => showSection("login"));
+    signupTab.addEventListener("click", () => showSection("signup"));
 
-      document.getElementById("formTitle").textContent =
-        signup ? "Create your account" : "Welcome back 👋";
-
-      document.getElementById("formSubtitle").textContent =
-        signup
-          ? "Register to access your personal account."
-          : "Sign in to access your account and manage your projects.";
-
-      nameField.classList.toggle("hidden", !signup);
-      nameInput.required = signup;
-      loginOptions.classList.toggle("hidden", signup);
-
-      passwordInput.autocomplete =
-        signup ? "new-password" : "current-password";
-
-      submitBtn.textContent =
-        signup ? "Create Account" : "Sign In";
-
-      document.getElementById("switchText").textContent =
-        signup ? "Already have an account?" : "Don't have an account?";
-
-      switchMode.textContent =
-        signup ? "Sign in" : "Create account";
-    }
-
-    switchMode.addEventListener("click", (event) => {
-      event.preventDefault();
-      setMode(!isSignup);
+    document.getElementById("forgotBtn").addEventListener("click", () => {
+      const email = document.getElementById("loginEmail").value.trim();
+      document.getElementById("resetEmail").value = email;
+      showSection("reset");
     });
 
-    document.getElementById("togglePassword")
-      .addEventListener("click", () => {
-        const showing = passwordInput.type === "text";
-        passwordInput.type = showing ? "password" : "text";
-        document.getElementById("togglePassword").textContent =
-          showing ? "Show" : "Hide";
-      });
-
-    // Save email only; never save the password.
-    const savedEmail = localStorage.getItem("ruddranilRememberedEmail");
-    if (savedEmail) {
-      emailInput.value = savedEmail;
-      rememberMe.checked = true;
-    }
-
-    rememberMe.addEventListener("change", () => {
-      if (rememberMe.checked && emailInput.value.trim()) {
-        localStorage.setItem(
-          "ruddranilRememberedEmail",
-          emailInput.value.trim()
-        );
-      } else {
-        localStorage.removeItem("ruddranilRememberedEmail");
-      }
+    document.getElementById("backToLogin").addEventListener("click", () => {
+      showSection("login");
     });
 
-    emailInput.addEventListener("input", () => {
-      if (rememberMe.checked) {
-        localStorage.setItem(
-          "ruddranilRememberedEmail",
-          emailInput.value.trim()
-        );
-      }
-    });
-
-    forgotPassword.addEventListener("click", async (event) => {
+    // CREATE CUSTOMER ACCOUNT
+    document.getElementById("signupForm").addEventListener("submit", async (event) => {
       event.preventDefault();
       clearMessage();
 
-      if (!initializeAuth()) return;
+      const button = document.getElementById("signupSubmit");
+      const fullName = document.getElementById("signupName").value.trim();
+      const email = document.getElementById("signupEmail").value.trim();
+      const password = document.getElementById("signupPassword").value;
+      const confirmPassword = document.getElementById("confirmPassword").value;
 
-      const email = emailInput.value.trim();
-      if (!email) {
-        showMessage("Enter your email address first.");
-        emailInput.focus();
-        return;
-      }
-
-      submitBtn.disabled = true;
-
-      try {
-        const redirectTo = new URL("./login.html", window.location.href).href;
-
-        const { error } = await supabaseClient.auth.resetPasswordForEmail(
-          email,
-          { redirectTo }
-        );
-
-        if (error) throw error;
-
-        showMessage(
-          "If the email is registered, password reset instructions will be sent. Check your inbox.",
-          "success"
-        );
-      } catch (error) {
-        showMessage(error.message || "Could not request a password reset.");
-      } finally {
-        submitBtn.disabled = false;
-      }
-    });
-
-    authForm.addEventListener("submit", async (event) => {
-      event.preventDefault();
-      clearMessage();
-
-      if (!initializeAuth()) return;
-
-      const email = emailInput.value.trim();
-      const password = passwordInput.value;
-      const fullName = nameInput.value.trim();
-
-      if (!email || !password) {
-        showMessage("Enter your email and password.");
-        return;
-      }
-
-      if (isSignup && !fullName) {
+      if (!fullName) {
         showMessage("Please enter your full name.");
         return;
       }
 
-      submitBtn.disabled = true;
-      submitBtn.textContent = isSignup ? "Creating account..." : "Signing in...";
+      if (password.length < 6) {
+        showMessage("Password must contain at least 6 characters.");
+        return;
+      }
+
+      if (password !== confirmPassword) {
+        showMessage("Passwords do not match.");
+        return;
+      }
+
+      setLoading(button, true, "Create Account");
 
       try {
-        if (isSignup) {
-          const { data, error } = await supabaseClient.auth.signUp({
-            email,
-            password,
-            options: {
-              data: { full_name: fullName },
-              emailRedirectTo:
-                new URL("./login.html", window.location.href).href
-            }
-          });
+        const client = getClient();
 
-          if (error) throw error;
-
-          if (data.session) {
-            showMessage(
-              "Account created successfully. Your dashboard will be connected in the next step.",
-              "success"
-            );
-          } else {
-            showMessage(
-              "Registration submitted. Check your email to confirm your account before signing in.",
-              "success"
-            );
+        const { data, error } = await client.auth.signUp({
+          email,
+          password,
+          options: {
+            data: {
+              full_name: fullName
+            },
+            emailRedirectTo: window.location.origin +
+              window.location.pathname.replace(/[^/]*$/, "login.html")
           }
-        } else {
-          const { error } = await supabaseClient.auth.signInWithPassword({
-            email,
-            password
-          });
+        });
 
-          if (error) throw error;
+        if (error) throw error;
 
-          if (rememberMe.checked) {
-            localStorage.setItem("ruddranilRememberedEmail", email);
-          } else {
-            localStorage.removeItem("ruddranilRememberedEmail");
-          }
+        document.getElementById("signupForm").reset();
 
+        if (data.session) {
           showMessage(
-            "Login successful! Your account is verified. Next, we will connect your dashboard.",
+            "Account created successfully! You are signed in. Customer dashboard setup is the next step.",
             "success"
           );
+        } else {
+          showMessage(
+            "Registration submitted! Check your email for the confirmation link, then return here to log in.",
+            "success"
+          );
+          showSection("login");
         }
       } catch (error) {
-        showMessage(error.message || "Something went wrong. Please try again.");
+        showMessage(error.message || "Could not create the account.");
       } finally {
-        submitBtn.disabled = false;
-        submitBtn.textContent = isSignup ? "Create Account" : "Sign In";
+        setLoading(button, false, "Create Account");
+      }
+    });
+
+    // CUSTOMER LOGIN
+    document.getElementById("loginForm").addEventListener("submit", async (event) => {
+      event.preventDefault();
+      clearMessage();
+
+      const button = document.getElementById("loginSubmit");
+      const email = document.getElementById("loginEmail").value.trim();
+      const password = document.getElementById("loginPassword").value;
+
+      setLoading(button, true, "Sign In");
+
+      try {
+        const client = getClient();
+
+        const { data, error } = await client.auth.signInWithPassword({
+          email,
+          password
+        });
+
+        if (error) throw error;
+
+        if (data.session) {
+          showMessage(
+            "Login successful! Your account is active. Customer dashboard setup is the next step.",
+            "success"
+          );
+
+          // Keep the customer on this page until the dashboard is created.
+          // Do not redirect to a dashboard file that may not exist yet.
+        }
+      } catch (error) {
+        showMessage(error.message || "Login failed. Please check your details.");
+      } finally {
+        setLoading(button, false, "Sign In");
+      }
+    });
+
+    // PASSWORD RESET
+    document.getElementById("resetForm").addEventListener("submit", async (event) => {
+      event.preventDefault();
+      clearMessage();
+
+      const button = document.getElementById("resetSubmit");
+      const email = document.getElementById("resetEmail").value.trim();
+
+      setLoading(button, true, "Send Reset Link");
+
+      try {
+        const client = getClient();
+
+        const redirectTo = window.location.origin +
+          window.location.pathname.replace(/[^/]*$/, "login.html");
+
+        const { error } = await client.auth.resetPasswordForEmail(email, {
+          redirectTo
+        });
+
+        if (error) throw error;
+
+        showMessage(
+          "If the email is registered, a password reset link will be sent. Check your inbox.",
+          "success"
+        );
+      } catch (error) {
+        showMessage(error.message || "Could not send the reset link.");
+      } finally {
+        setLoading(button, false, "Send Reset Link");
       }
     });
   </script>
 </body>
 </html>
+```
