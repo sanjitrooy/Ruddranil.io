@@ -268,149 +268,213 @@ function setupLikeButtons() {
   });
 }
 
-  /* ---------- 6. COMMENTS ---------- */
 
-  function setupCommentButtons() {
-    document.querySelectorAll(".work-post").forEach((post) => {
-      const postId = getPostId(post);
-      const commentButton = Array.from(post.querySelectorAll("button"))
-        .find((button) => /^comment\b/i.test(button.textContent.trim()));
+    
+/* ---------- COMMENTS: SUPABASE ---------- */
 
-      if (!commentButton || commentButton.dataset.commentReady === "true") {
+function setupCommentButtons() {
+  if (!supabaseClient) {
+    console.error("Supabase client is not initialized.");
+    return;
+  }
+
+  document.querySelectorAll(".work-post").forEach((post) => {
+    const postId = getPostId(post);
+
+    const commentButton = Array.from(
+      post.querySelectorAll("button")
+    ).find((button) =>
+      /^comment\b/i.test(button.textContent.trim())
+    );
+
+    if (
+      !commentButton ||
+      commentButton.dataset.commentReady === "true"
+    ) {
+      return;
+    }
+
+    commentButton.dataset.commentReady = "true";
+    commentButton.innerHTML = "💬 Comment";
+
+    const panel = document.createElement("div");
+    panel.className = "comment-panel";
+    panel.hidden = true;
+
+    Object.assign(panel.style, {
+      marginTop: "14px",
+      padding: "14px",
+      borderRadius: "12px",
+      background: "rgba(127,127,127,.08)"
+    });
+
+    const list = document.createElement("div");
+
+    const form = document.createElement("form");
+
+    Object.assign(form.style, {
+      display: "grid",
+      gap: "10px",
+      marginTop: "12px"
+    });
+
+    const nameInput = document.createElement("input");
+    nameInput.type = "text";
+    nameInput.placeholder = "Your name";
+    nameInput.maxLength = 80;
+    nameInput.required = true;
+    nameInput.autocomplete = "name";
+    nameInput.setAttribute("aria-label", "Your name");
+
+    const commentInput = document.createElement("textarea");
+    commentInput.placeholder = "Write a comment...";
+    commentInput.maxLength = 1000;
+    commentInput.required = true;
+    commentInput.rows = 3;
+    commentInput.setAttribute("aria-label", "Write a comment");
+
+    const submitButton = document.createElement("button");
+    submitButton.type = "submit";
+    submitButton.textContent = "💬 Post Comment";
+
+    [nameInput, commentInput].forEach((input) => {
+      Object.assign(input.style, {
+        width: "100%",
+        boxSizing: "border-box",
+        padding: "11px",
+        border: "1px solid #aaa",
+        borderRadius: "9px",
+        font: "inherit"
+      });
+    });
+
+    Object.assign(submitButton.style, {
+      padding: "10px 16px",
+      border: "0",
+      borderRadius: "9px",
+      cursor: "pointer"
+    });
+
+    async function loadComments() {
+      list.replaceChildren();
+
+      const loading = document.createElement("p");
+      loading.textContent = "Loading comments...";
+      list.appendChild(loading);
+
+      const { data, error } = await supabaseClient
+        .from("post_comments")
+        .select("id, display_name, comment_text, created_at")
+        .eq("post_id", postId)
+        .order("created_at", { ascending: false });
+
+      list.replaceChildren();
+
+      if (error) {
+        console.error("Load comments error:", error);
+        const message = document.createElement("p");
+        message.textContent = "Could not load comments. Please try again.";
+        list.appendChild(message);
         return;
       }
 
-      commentButton.dataset.commentReady = "true";
-
-      const storageKey = "ruddranil-comments-" + postId;
-
-      const panel = document.createElement("div");
-      panel.className = "local-comment-panel";
-      panel.hidden = true;
-
-      Object.assign(panel.style, {
-        marginTop: "12px",
-        padding: "12px",
-        borderRadius: "10px",
-        background: "rgba(127,127,127,.08)"
-      });
-
-      const list = document.createElement("div");
-      list.className = "local-comment-list";
-
-      const form = document.createElement("form");
-      form.style.display = "flex";
-      form.style.flexWrap = "wrap";
-      form.style.gap = "8px";
-      form.style.marginTop = "10px";
-
-      const input = document.createElement("input");
-      input.type = "text";
-      input.placeholder = "Write a comment...";
-      input.maxLength = 500;
-      input.required = true;
-      input.setAttribute("aria-label", "Write a comment");
-
-      Object.assign(input.style, {
-        flex: "1 1 180px",
-        minWidth: "0",
-        padding: "10px",
-        borderRadius: "8px",
-        border: "1px solid #888"
-      });
-
-      const send = document.createElement("button");
-      send.type = "submit";
-      send.textContent = "Post Comment";
-
-      const empty = document.createElement("p");
-      empty.textContent = "No comments yet.";
-      empty.className = "comment-empty";
-
-      function renderComments() {
-        list.replaceChildren();
-
-        const comments = readJSON(storageKey, []);
-
-        if (!comments.length) {
-          list.appendChild(empty);
-          return;
-        }
-
-        comments.forEach((comment, index) => {
-          const item = document.createElement("div");
-
-          Object.assign(item.style, {
-            padding: "10px 0",
-            borderBottom: "1px solid rgba(127,127,127,.25)"
-          });
-
-          const text = document.createElement("p");
-          text.textContent = comment.text;
-          text.style.margin = "0 0 6px";
-
-          const date = document.createElement("small");
-          date.textContent = new Date(comment.createdAt).toLocaleString();
-
-          const remove = document.createElement("button");
-          remove.type = "button";
-          remove.textContent = "Delete";
-          remove.style.marginLeft = "10px";
-
-          remove.addEventListener("click", () => {
-            const updated = readJSON(storageKey, []);
-            updated.splice(index, 1);
-            writeJSON(storageKey, updated);
-            renderComments();
-            notify("Comment deleted from this browser.", "info");
-          });
-
-          item.append(text, date, remove);
-          list.appendChild(item);
-        });
+      if (!data || data.length === 0) {
+        const message = document.createElement("p");
+        message.textContent = "No comments yet. Be the first to comment!";
+        list.appendChild(message);
+        return;
       }
 
-      form.append(input, send);
-      panel.append(list, form);
-      commentButton.insertAdjacentElement("afterend", panel);
+      data.forEach((comment) => {
+        const item = document.createElement("div");
 
-      commentButton.addEventListener("click", () => {
-        panel.hidden = !panel.hidden;
-
-        if (!panel.hidden) {
-          renderComments();
-          input.focus();
-        }
-      });
-
-      form.addEventListener("submit", (event) => {
-        event.preventDefault();
-
-        const text = input.value.trim();
-
-        if (!text) {
-          notify("Please write a comment first.", "warning");
-          return;
-        }
-
-        const comments = readJSON(storageKey, []);
-
-        comments.push({
-          text,
-          createdAt: new Date().toISOString()
+        Object.assign(item.style, {
+          padding: "12px 0",
+          borderBottom: "1px solid rgba(127,127,127,.25)"
         });
 
-        if (!writeJSON(storageKey, comments)) return;
+        const author = document.createElement("strong");
+        author.textContent = comment.display_name || "Visitor";
 
-        input.value = "";
-        renderComments();
-        notify("Comment added in this browser.", "success");
+        const body = document.createElement("p");
+        body.textContent = comment.comment_text;
+        body.style.margin = "6px 0";
+
+        const date = document.createElement("small");
+        date.textContent = comment.created_at
+          ? new Date(comment.created_at).toLocaleString()
+          : "";
+
+        item.append(author, body, date);
+        list.appendChild(item);
       });
+    }
 
-      renderComments();
+    form.append(nameInput, commentInput, submitButton);
+    panel.append(list, form);
+    commentButton.insertAdjacentElement("afterend", panel);
+
+    commentButton.addEventListener("click", async () => {
+      panel.hidden = !panel.hidden;
+
+      if (!panel.hidden) {
+        await loadComments();
+        nameInput.focus();
+      }
     });
-  }
 
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      const displayName = nameInput.value.trim();
+      const commentText = commentInput.value.trim();
+
+      if (!displayName || displayName.length > 80) {
+        notify("Enter a name (maximum 80 characters).", "warning");
+        return;
+      }
+
+      if (!commentText || commentText.length > 1000) {
+        notify("Write a comment (maximum 1000 characters).", "warning");
+        return;
+      }
+
+      submitButton.disabled = true;
+      submitButton.textContent = "Posting...";
+
+      try {
+        const { error } = await supabaseClient
+          .from("post_comments")
+          .insert({
+            post_id: postId,
+            display_name: displayName,
+            comment_text: commentText,
+            user_id: (
+              await supabaseClient.auth.getUser()
+            ).data.user?.id
+          });
+
+        if (error) throw error;
+
+        commentInput.value = "";
+        await loadComments();
+        notify("Comment posted successfully!", "success");
+      } catch (error) {
+        console.error("Post comment error:", error);
+        notify(
+          "Comment could not be posted. Check Supabase permissions and anonymous sign-in.",
+          "error"
+        );
+      } finally {
+        submitButton.disabled = false;
+        submitButton.textContent = "💬 Post Comment";
+      }
+    });
+  });
+}
+
+
+   
   /* ---------- 7. SHARE ---------- */
 
   function setupShareButtons() {
