@@ -464,7 +464,7 @@ if (contactForm) {
 
         // Use the URL and publishable key from your correct Supabase project.
         const SUPABASE_URL = "https://udvvhqjgotwvqfjnfnrn.supabase.co";
-        const SUPABASE_PUBLISHABLE_KEY = "PASTE_YOUR_UDVV_PROJECT_PUBLISHABLE_KEY_HERE";
+        const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_oiH3zhFQpyVyxqrlvtRmOA_jPeFsdLV";
 
         if (
             !SUPABASE_PUBLISHABLE_KEY ||
