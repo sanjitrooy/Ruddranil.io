@@ -1,0 +1,258 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Customer Dashboard | Ruddranil.io</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #0b1120;
+      color: #f8fafc;
+      min-height: 100vh;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 20px 6%;
+      background: #111827;
+      border-bottom: 1px solid #263449;
+    }
+
+    header h1 {
+      font-size: 21px;
+    }
+
+    header h1 span {
+      color: #38bdf8;
+    }
+
+    button, .btn {
+      border: 0;
+      border-radius: 9px;
+      padding: 11px 16px;
+      font-weight: bold;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .logout {
+      color: white;
+      background: #dc2626;
+    }
+
+    main {
+      width: min(1050px, 92%);
+      margin: 35px auto;
+    }
+
+    .welcome {
+      padding: 27px;
+      border-radius: 18px;
+      background: linear-gradient(120deg, #164e63, #1d4ed8);
+      margin-bottom: 24px;
+    }
+
+    .welcome h2 {
+      margin-bottom: 10px;
+      font-size: 27px;
+    }
+
+    .welcome p {
+      line-height: 1.7;
+      color: #e0f2fe;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 18px;
+    }
+
+    .card {
+      background: #111827;
+      border: 1px solid #263449;
+      border-radius: 15px;
+      padding: 23px;
+    }
+
+    .card h3 {
+      color: #7dd3fc;
+      margin-bottom: 12px;
+    }
+
+    .card p {
+      color: #cbd5e1;
+      line-height: 1.8;
+      overflow-wrap: anywhere;
+    }
+
+    .actions {
+      margin-top: 25px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .primary {
+      color: white;
+      background: #2563eb;
+    }
+
+    .secondary {
+      color: white;
+      background: #334155;
+    }
+
+    #status {
+      margin-top: 20px;
+      color: #fbbf24;
+      line-height: 1.7;
+    }
+
+    @media (max-width: 480px) {
+      header {
+        padding: 17px 4%;
+      }
+
+      header h1 {
+        font-size: 17px;
+      }
+
+      .welcome h2 {
+        font-size: 23px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>Ruddranil<span>.io</span></h1>
+    <button class="logout" id="logoutBtn">Logout</button>
+  </header>
+
+  <main>
+    <section class="welcome">
+      <h2 id="welcomeName">Welcome, Customer!</h2>
+      <p>
+        Welcome to your customer dashboard.
+        Manage your account and access your project services here.
+      </p>
+    </section>
+
+    <section class="grid">
+      <article class="card">
+        <h3>My Profile</h3>
+        <p><strong>Name:</strong> <span id="customerName">Loading...</span></p>
+        <p><strong>Email:</strong> <span id="customerEmail">Loading...</span></p>
+      </article>
+
+      <article class="card">
+        <h3>My Orders</h3>
+        <p>Your submitted project requests will be connected here in the next step.</p>
+      </article>
+
+      <article class="card">
+        <h3>Work Tracking</h3>
+        <p>Order ID and project completion progress will be connected here next.</p>
+      </article>
+
+      <article class="card">
+        <h3>Customer Reviews</h3>
+        <p>After an order is completed, the review and rating option will be added.</p>
+      </article>
+    </section>
+
+    <div class="actions">
+      <a href="index.html#services" class="btn primary">Browse Services</a>
+      <a href="index.html#contact" class="btn secondary">Submit a Request</a>
+      <a href="index.html" class="btn secondary">Back to Home</a>
+    </div>
+
+    <p id="status" role="status" aria-live="polite"></p>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <script>
+    const SUPABASE_URL =
+      "https://udvvhqjgotwvqfjnfnrn.supabase.co";
+
+    // Use the SAME project's publishable key as login.html.
+    const SUPABASE_PUBLISHABLE_KEY =
+      "PASTE_YOUR_UDVV_PROJECT_PUBLISHABLE_KEY_HERE";
+
+    const statusBox = document.getElementById("status");
+
+    async function initDashboard() {
+      try {
+        if (!window.supabase) {
+          throw new Error("Supabase library did not load. Refresh the page.");
+        }
+
+        if (SUPABASE_PUBLISHABLE_KEY.includes("PASTE_YOUR_")) {
+          throw new Error("Add your Supabase publishable key before using this page.");
+        }
+
+        const client = window.supabase.createClient(
+          SUPABASE_URL,
+          SUPABASE_PUBLISHABLE_KEY
+        );
+
+        const { data, error } = await client.auth.getUser();
+
+        if (error || !data.user) {
+          window.location.replace("login.html");
+          return;
+        }
+
+        const user = data.user;
+        const name = user.user_metadata?.full_name || "Customer";
+
+        document.getElementById("welcomeName").textContent =
+          "Welcome, " + name + "!";
+
+        document.getElementById("customerName").textContent = name;
+        document.getElementById("customerEmail").textContent =
+          user.email || "Not available";
+
+      } catch (error) {
+        statusBox.textContent = error.message;
+      }
+    }
+
+    document.getElementById("logoutBtn").addEventListener("click", async () => {
+      try {
+        const client = window.supabase.createClient(
+          SUPABASE_URL,
+          SUPABASE_PUBLISHABLE_KEY
+        );
+
+        const { error } = await client.auth.signOut();
+
+        if (error) throw error;
+
+        window.location.replace("login.html");
+      } catch (error) {
+        statusBox.textContent = error.message;
+      }
+    });
+
+    initDashboard();
+  </script>
+</body>
+</html>
+```
