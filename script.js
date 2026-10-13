@@ -1,662 +1,674 @@
-/* =====================================================
-   RUDDRANIL.IO
-   MAIN JAVASCRIPT
-===================================================== */
 
-document.addEventListener("DOMContentLoaded", () => {
+/* =========================================================
+   RUDDRANIL.IO — MAIN WEBSITE SCRIPT
+   Supabase Orders + Notifications + Like + Comment + Share
+   ========================================================= */
 
-    /* =================================================
-       MOBILE MENU
-    ================================================= */
+(() => {
+  "use strict";
 
-    const menuToggle = document.getElementById("menuToggle");
-    const mainNav = document.getElementById("mainNav");
+  /* ---------- 1. SUPABASE CONFIGURATION ---------- */
 
-    if (menuToggle && mainNav) {
+  const SUPABASE_URL = "https://udvvhqjgotwvqfjnfnrn.supabase.co";
+  const SUPABASE_KEY = "sb_publishable_oiH3zhFQpyVyxqrlvtRmOA_jPeFsdLV";
 
-        menuToggle.addEventListener("click", () => {
+  let supabaseClient = null;
 
-            mainNav.classList.toggle("active");
+  if (window.supabase?.createClient) {
+    supabaseClient = window.supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_KEY
+    );
+  }
 
-            if (mainNav.classList.contains("active")) {
+  /* ---------- 2. NOTIFICATION SYSTEM ---------- */
 
-                menuToggle.textContent = "✕";
-                menuToggle.setAttribute(
-                    "aria-label",
-                    "Close Menu"
-                );
+  function notify(message, type = "info") {
+    let box = document.getElementById("siteNotification");
 
-            } else {
+    if (!box) {
+      box = document.createElement("div");
+      box.id = "siteNotification";
 
-                menuToggle.textContent = "☰";
-                menuToggle.setAttribute(
-                    "aria-label",
-                    "Open Menu"
-                );
+      Object.assign(box.style, {
+        position: "fixed",
+        top: "20px",
+        right: "20px",
+        zIndex: "999999",
+        maxWidth: "min(390px, calc(100vw - 40px))",
+        padding: "15px 18px",
+        borderRadius: "12px",
+        color: "#fff",
+        fontSize: "14px",
+        lineHeight: "1.5",
+        boxShadow: "0 8px 30px rgba(0,0,0,.25)",
+        display: "none",
+        overflowWrap: "anywhere"
+      });
 
-            }
-
-        });
-
-
-        /* Close menu after clicking a navigation link */
-
-        const navLinks =
-            document.querySelectorAll(".main-nav a");
-
-        navLinks.forEach((link) => {
-
-            link.addEventListener("click", () => {
-
-                mainNav.classList.remove("active");
-
-                menuToggle.textContent = "☰";
-
-                menuToggle.setAttribute(
-                    "aria-label",
-                    "Open Menu"
-                );
-
-            });
-
-        });
-
+      document.body.appendChild(box);
     }
 
-
-    /* =================================================
-       SMOOTH SCROLL
-    ================================================= */
-
-    const anchorLinks =
-        document.querySelectorAll('a[href^="#"]');
-
-    anchorLinks.forEach((link) => {
-
-        link.addEventListener("click", (event) => {
-
-            const targetId =
-                link.getAttribute("href");
-
-            if (
-                !targetId ||
-                targetId === "#"
-            ) {
-                return;
-            }
-
-            const target =
-                document.querySelector(targetId);
-
-            if (!target) {
-                return;
-            }
-
-            event.preventDefault();
-
-            target.scrollIntoView({
-                behavior: "smooth",
-                block: "start"
-            });
-
-        });
-
-    });
-
-
-    /* =================================================
-       ACTIVE NAVIGATION
-    ================================================= */
-
-    const sections =
-        document.querySelectorAll("section[id]");
-
-    const navigationLinks =
-        document.querySelectorAll(".main-nav a");
-
-    const updateActiveNavigation = () => {
-
-        let currentSection = "";
-
-        const scrollPosition =
-            window.scrollY + 180;
-
-        sections.forEach((section) => {
-
-            const sectionTop =
-                section.offsetTop;
-
-            const sectionHeight =
-                section.offsetHeight;
-
-            if (
-                scrollPosition >= sectionTop &&
-                scrollPosition <
-                    sectionTop + sectionHeight
-            ) {
-
-                currentSection =
-                    section.getAttribute("id");
-
-            }
-
-        });
-
-        navigationLinks.forEach((link) => {
-
-            link.classList.remove("active");
-
-            const href =
-                link.getAttribute("href");
-
-            if (
-                href === "#" + currentSection
-            ) {
-
-                link.classList.add("active");
-
-            }
-
-        });
-
+    const colors = {
+      success: "#16803d",
+      error: "#b42318",
+      info: "#2457c5",
+      warning: "#9a6700"
     };
 
-
-    window.addEventListener(
-        "scroll",
-        updateActiveNavigation
-    );
-
-    updateActiveNavigation();
-
-
-    /* =================================================
-       HEADER SCROLL EFFECT
-    ================================================= */
-
-    const header =
-        document.querySelector(".site-header");
-
-    const handleHeaderScroll = () => {
-
-        if (!header) {
-            return;
-        }
-
-        if (window.scrollY > 30) {
-
-            header.classList.add("scrolled");
-
-        } else {
-
-            header.classList.remove("scrolled");
-
-        }
-
-    };
-
-
-    window.addEventListener(
-        "scroll",
-        handleHeaderScroll
-    );
-
-    handleHeaderScroll();
-
-
-    /* =================================================
-       LIKE BUTTON
-       FRONT-END DEMO
-    ================================================= */
-
-    const likeButtons =
-        document.querySelectorAll(
-            ".post-actions button"
-        );
-
-    likeButtons.forEach((button) => {
-
-        const buttonText =
-            button.textContent.trim();
-
-        if (!buttonText.includes("Like")) {
-            return;
-        }
-
-        button.addEventListener("click", () => {
-
-            const liked =
-                button.classList.toggle("liked");
-
-            if (liked) {
-
-                button.innerHTML = "♥ Liked";
-
-            } else {
-
-                button.innerHTML = "♡ Like";
-
-            }
-
-        });
-
-    });
-
-
-    /* =================================================
-       COMMENT BUTTON
-       TEMPORARY DEMO
-    ================================================= */
-
-    const commentButtons =
-        document.querySelectorAll(
-            ".post-actions button"
-        );
-
-    commentButtons.forEach((button) => {
-
-        const buttonText =
-            button.textContent.trim();
-
-        if (!buttonText.includes("Comment")) {
-            return;
-        }
-
-        button.addEventListener("click", () => {
-
-            alert(
-                "Comment system will be available soon."
-            );
-
-        });
-
-    });
-
-
-    /* =================================================
-       SHARE BUTTON
-    ================================================= */
-
-    const shareButtons =
-        document.querySelectorAll(
-            ".post-actions button"
-        );
-
-    shareButtons.forEach((button) => {
-
-        const buttonText =
-            button.textContent.trim();
-
-        if (!buttonText.includes("Share")) {
-            return;
-        }
-
-        button.addEventListener("click", async () => {
-
-            const currentUrl =
-                window.location.href;
-
-            try {
-
-                if (
-                    navigator.share
-                ) {
-
-                    await navigator.share({
-                        title:
-                            "Ruddranil Portfolio",
-                        text:
-                            "Check out this work from Ruddranil.",
-                        url:
-                            currentUrl
-                    });
-
-                } else if (
-                    navigator.clipboard
-                ) {
-
-                    await navigator.clipboard.writeText(
-                        currentUrl
-                    );
-
-                    alert(
-                        "Page link copied successfully."
-                    );
-
-                } else {
-
-                    alert(
-                        "Share this page: " +
-                        currentUrl
-                    );
-
-                }
-
-            } catch (error) {
-
-                console.log(
-                    "Share cancelled or unavailable."
-                );
-
-            }
-
-        });
-
-    });
-
-
-    /* =================================================
-       CONTACT FORM
-       TEMPORARY FRONT-END HANDLER
-    ================================================= */
-
-    const contactForm =
-        document.getElementById("contactForm");
-
-    if (contactForm) {
-
-        contactForm.addEventListener(
-            "submit",
-            (event) => {
-
-                event.preventDefault();
-
-                const name =
-                    document.getElementById(
-                        "contactName"
-                    );
-
-                const email =
-                    document.getElementById(
-                        "contactEmail"
-                    );
-
-                const service =
-                    document.getElementById(
-                        "contactService"
-                    );
-
-                const message =
-                    document.getElementById(
-                        "contactMessage"
-                    );
-
-
-                if (
-                    !name ||
-                    !email ||
-                    !service ||
-                    !message
-                ) {
-
-                    return;
-
-                }
-
-
-                if (
-                    !name.value.trim() ||
-                    !email.value.trim() ||
-                    !service.value ||
-                    !message.value.trim()
-                ) {
-
-                    alert(
-                        "Please complete all required fields."
-                    );
-
-                    return;
-
-                }
-
-
-                alert(
-                    "Thank you, " +
-                    name.value.trim() +
-                    "! Your message has been received."
-                );
-
-
-                contactForm.reset();
-
-            }
-        );
-
+    box.style.background = colors[type] || colors.info;
+    box.textContent = message;
+    box.style.display = "block";
+
+    if (box._hideTimer) clearTimeout(box._hideTimer);
+
+    box._hideTimer = setTimeout(() => {
+      box.style.display = "none";
+    }, 6000);
+  }
+
+  /* ---------- 3. SAFE LOCAL STORAGE ---------- */
+
+  function readJSON(key, fallback) {
+    try {
+      const value = localStorage.getItem(key);
+      return value ? JSON.parse(value) : fallback;
+    } catch {
+      return fallback;
     }
+  }
 
+  function writeJSON(key, value) {
+    try {
+      localStorage.setItem(key, JSON.stringify(value));
+      return true;
+    } catch {
+      notify("Browser storage unavailable. Please check browser settings.", "error");
+      return false;
+    }
+  }
 
-    
-/* =================================================
-   CONTACT FORM
-   SUPABASE ORDER SUBMISSION
-================================================= */
+  /* ---------- 4. CONTACT FORM / ORDER SUBMISSION ---------- */
 
-const contactForm = document.getElementById("contactForm");
+  const contactForm = document.getElementById("contactForm");
 
-if (contactForm) {
+  if (contactForm) {
     contactForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      if (!supabaseClient) {
+        notify(
+          "Supabase could not load. Check the Supabase CDN script in index.html.",
+          "error"
+        );
+        return;
+      }
+
+      const nameInput = document.getElementById("contactName");
+      const emailInput = document.getElementById("contactEmail");
+      const serviceInput = document.getElementById("contactService");
+      const messageInput = document.getElementById("contactMessage");
+      const submitButton = contactForm.querySelector('[type="submit"]');
+
+      if (!nameInput || !emailInput || !serviceInput || !messageInput) {
+        notify("Contact form fields are missing. Please check index.html.", "error");
+        return;
+      }
+
+      const customerName = nameInput.value.trim();
+      const customerEmail = emailInput.value.trim();
+      const service = serviceInput.value;
+      const message = messageInput.value.trim();
+
+      if (!customerName || !customerEmail || !service || !message) {
+        notify("Please fill in all contact form fields.", "warning");
+        return;
+      }
+
+      if (!emailInput.checkValidity()) {
+        notify("Please enter a valid email address.", "warning");
+        emailInput.focus();
+        return;
+      }
+
+      const oldButtonText = submitButton?.textContent || "Send Message";
+
+      if (submitButton) {
+        submitButton.disabled = true;
+        submitButton.textContent = "Submitting...";
+      }
+
+      try {
+        const { data: authData, error: authError } =
+          await supabaseClient.auth.getUser();
+
+        if (authError) {
+          throw authError;
+        }
+
+        const user = authData?.user;
+
+        if (!user) {
+          notify(
+            "Please log in to your account before submitting an order.",
+            "warning"
+          );
+
+          sessionStorage.setItem("pendingOrderForm", "true");
+
+          setTimeout(() => {
+            window.location.href = "login.html";
+          }, 1200);
+
+          return;
+        }
+
+        const { data: order, error: orderError } = await supabaseClient
+          .from("orders")
+          .insert({
+            customer_id: user.id,
+            customer_name: customerName,
+            customer_email: user.email || customerEmail,
+            service: service,
+            message: message,
+            status: "Pending",
+            progress: 0
+          })
+          .select("order_id")
+          .single();
+
+        if (orderError) {
+          console.error("Order submission error:", orderError);
+          throw orderError;
+        }
+
+        if (!order?.order_id) {
+          throw new Error("Order was submitted, but no Order ID was returned.");
+        }
+
+        contactForm.reset();
+
+        notify(
+          "Order submitted successfully! Your Order ID: " + order.order_id,
+          "success"
+        );
+
+        alert(
+          "Order submitted successfully!\n\n" +
+          "Order ID: " + order.order_id +
+          "\nStatus: Pending\n\n" +
+          "You can track your order from your customer dashboard."
+        );
+
+      } catch (error) {
+        console.error("Contact/order error:", error);
+
+        let messageText = error?.message || "Unknown error";
+
+        if (
+          messageText.toLowerCase().includes("row-level security") ||
+          messageText.toLowerCase().includes("policy")
+        ) {
+          messageText =
+            "Database permission blocked the order. Check the orders table RLS policies.";
+        } else if (
+          messageText.toLowerCase().includes("fetch") ||
+          messageText.toLowerCase().includes("network")
+        ) {
+          messageText =
+            "Network or Supabase connection failed. Please try again.";
+        }
+
+        notify("Order was not confirmed: " + messageText, "error");
+
+      } finally {
+        if (submitButton) {
+          submitButton.disabled = false;
+          submitButton.textContent = oldButtonText;
+        }
+      }
+    });
+  }
+
+  /* ---------- 5. LIKE / UNLIKE ---------- */
+
+  function getPostId(post) {
+    if (post.dataset.postId) return post.dataset.postId;
+
+    const heading = post.querySelector("h2, h3, h4");
+    const title = heading?.textContent?.trim() || "work-post";
+
+    const allPosts = Array.from(document.querySelectorAll(".work-post"));
+    const index = allPosts.indexOf(post);
+
+    post.dataset.postId = "post-" + index + "-" +
+      title.toLowerCase().replace(/[^a-z0-9]+/g, "-").slice(0, 50);
+
+    return post.dataset.postId;
+  }
+
+  function setupLikeButtons() {
+    document.querySelectorAll(".work-post").forEach((post) => {
+      const postId = getPostId(post);
+      const likeButton = Array.from(post.querySelectorAll("button"))
+        .find((button) => /^like\b/i.test(button.textContent.trim()));
+
+      if (!likeButton || likeButton.dataset.likeReady === "true") return;
+
+      likeButton.dataset.likeReady = "true";
+
+      const key = "ruddranil-liked-" + postId;
+      let liked = localStorage.getItem(key) === "true";
+
+      function renderLike() {
+        likeButton.textContent = liked ? "♥ Liked" : "♡ Like";
+        likeButton.setAttribute("aria-pressed", String(liked));
+      }
+
+      renderLike();
+
+      likeButton.addEventListener("click", () => {
+        liked = !liked;
+
+        if (liked) {
+          localStorage.setItem(key, "true");
+          notify("You liked this post.", "success");
+        } else {
+          localStorage.removeItem(key);
+          notify("Like removed.", "info");
+        }
+
+        renderLike();
+      });
+    });
+  }
+
+  /* ---------- 6. COMMENTS ---------- */
+
+  function setupCommentButtons() {
+    document.querySelectorAll(".work-post").forEach((post) => {
+      const postId = getPostId(post);
+      const commentButton = Array.from(post.querySelectorAll("button"))
+        .find((button) => /^comment\b/i.test(button.textContent.trim()));
+
+      if (!commentButton || commentButton.dataset.commentReady === "true") {
+        return;
+      }
+
+      commentButton.dataset.commentReady = "true";
+
+      const storageKey = "ruddranil-comments-" + postId;
+
+      const panel = document.createElement("div");
+      panel.className = "local-comment-panel";
+      panel.hidden = true;
+
+      Object.assign(panel.style, {
+        marginTop: "12px",
+        padding: "12px",
+        borderRadius: "10px",
+        background: "rgba(127,127,127,.08)"
+      });
+
+      const list = document.createElement("div");
+      list.className = "local-comment-list";
+
+      const form = document.createElement("form");
+      form.style.display = "flex";
+      form.style.flexWrap = "wrap";
+      form.style.gap = "8px";
+      form.style.marginTop = "10px";
+
+      const input = document.createElement("input");
+      input.type = "text";
+      input.placeholder = "Write a comment...";
+      input.maxLength = 500;
+      input.required = true;
+      input.setAttribute("aria-label", "Write a comment");
+
+      Object.assign(input.style, {
+        flex: "1 1 180px",
+        minWidth: "0",
+        padding: "10px",
+        borderRadius: "8px",
+        border: "1px solid #888"
+      });
+
+      const send = document.createElement("button");
+      send.type = "submit";
+      send.textContent = "Post Comment";
+
+      const empty = document.createElement("p");
+      empty.textContent = "No comments yet.";
+      empty.className = "comment-empty";
+
+      function renderComments() {
+        list.replaceChildren();
+
+        const comments = readJSON(storageKey, []);
+
+        if (!comments.length) {
+          list.appendChild(empty);
+          return;
+        }
+
+        comments.forEach((comment, index) => {
+          const item = document.createElement("div");
+
+          Object.assign(item.style, {
+            padding: "10px 0",
+            borderBottom: "1px solid rgba(127,127,127,.25)"
+          });
+
+          const text = document.createElement("p");
+          text.textContent = comment.text;
+          text.style.margin = "0 0 6px";
+
+          const date = document.createElement("small");
+          date.textContent = new Date(comment.createdAt).toLocaleString();
+
+          const remove = document.createElement("button");
+          remove.type = "button";
+          remove.textContent = "Delete";
+          remove.style.marginLeft = "10px";
+
+          remove.addEventListener("click", () => {
+            const updated = readJSON(storageKey, []);
+            updated.splice(index, 1);
+            writeJSON(storageKey, updated);
+            renderComments();
+            notify("Comment deleted from this browser.", "info");
+          });
+
+          item.append(text, date, remove);
+          list.appendChild(item);
+        });
+      }
+
+      form.append(input, send);
+      panel.append(list, form);
+      commentButton.insertAdjacentElement("afterend", panel);
+
+      commentButton.addEventListener("click", () => {
+        panel.hidden = !panel.hidden;
+
+        if (!panel.hidden) {
+          renderComments();
+          input.focus();
+        }
+      });
+
+      form.addEventListener("submit", (event) => {
         event.preventDefault();
 
-        const name = document.getElementById("contactName");
-        const email = document.getElementById("contactEmail");
-        const service = document.getElementById("contactService");
-        const message = document.getElementById("contactMessage");
+        const text = input.value.trim();
 
-        if (!name || !email || !service || !message) {
-            alert("Contact form fields could not be found.");
-            return;
+        if (!text) {
+          notify("Please write a comment first.", "warning");
+          return;
         }
 
-        if (
-            !name.value.trim() ||
-            !email.value.trim() ||
-            !service.value ||
-            !message.value.trim()
-        ) {
-            alert("Please complete all required fields.");
-            return;
-        }
+        const comments = readJSON(storageKey, []);
 
-        if (!window.supabase) {
-            alert("Supabase library did not load. Please refresh and try again.");
-            return;
-        }
+        comments.push({
+          text,
+          createdAt: new Date().toISOString()
+        });
 
-        // Use the URL and publishable key from your correct Supabase project.
-        const SUPABASE_URL = "https://udvvhqjgotwvqfjnfnrn.supabase.co";
-        const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_oiH3zhFQpyVyxqrlvtRmOA_jPeFsdLV";
+        if (!writeJSON(storageKey, comments)) return;
 
-        if (
-            !SUPABASE_PUBLISHABLE_KEY ||
-            SUPABASE_PUBLISHABLE_KEY === "sb_publishable_oiH3zhFQpyVyxqrlvtRmOA_jPeFsdLV";
-        ) {
-            alert("Please add your Supabase publishable key in script.js first.");
-            return;
-        }
+        input.value = "";
+        renderComments();
+        notify("Comment added in this browser.", "success");
+      });
 
-        const submitButton = contactForm.querySelector('button[type="submit"]');
+      renderComments();
+    });
+  }
+
+  /* ---------- 7. SHARE ---------- */
+
+  function setupShareButtons() {
+    document.querySelectorAll(".work-post").forEach((post) => {
+      const shareButton = Array.from(post.querySelectorAll("button"))
+        .find((button) => /^share\b/i.test(button.textContent.trim()));
+
+      if (!shareButton || shareButton.dataset.shareReady === "true") return;
+
+      shareButton.dataset.shareReady = "true";
+
+      shareButton.addEventListener("click", async () => {
+        const heading = post.querySelector("h2, h3, h4");
+        const title = heading?.textContent?.trim() || "Ruddranil.io Work";
+
+        const shareData = {
+          title,
+          text: "Check out this work on Ruddranil.io",
+          url: window.location.href.split("#")[0] + "#" + getPostId(post)
+        };
 
         try {
-            if (submitButton) {
-                submitButton.disabled = true;
-                submitButton.textContent = "Submitting...";
-            }
-
-            const supabaseClient = window.supabase.createClient(
-                SUPABASE_URL,
-                SUPABASE_PUBLISHABLE_KEY
-            );
-
-            const { data: userResult, error: userError } =
-                await supabaseClient.auth.getUser();
-
-            if (userError || !userResult.user) {
-                alert("Please log in before placing an order.");
-                window.location.href = "login.html";
-                return;
-            }
-
-            const user = userResult.user;
-
-            const { data: order, error: orderError } =
-                await supabaseClient
-                    .from("orders")
-                    .insert({
-                        customer_id: user.id,
-                        customer_name: name.value.trim(),
-                        customer_email: email.value.trim(),
-                        service: service.value,
-                        message: message.value.trim()
-                    })
-                    .select("order_id")
-                    .single();
-
-            if (orderError) {
-                console.error("Order submission error:", orderError);
-                alert("Order could not be submitted. Please check your Supabase key, login session, and orders table permissions.");
-                return;
-            }
-
-            alert(
-                "Thank you, " + name.value.trim() +
-                "! Your order was submitted successfully.\nOrder ID: " +
-                order.order_id
-            );
-
-            contactForm.reset();
-
+          if (navigator.share) {
+            await navigator.share(shareData);
+          } else if (navigator.clipboard?.writeText) {
+            await navigator.clipboard.writeText(shareData.url);
+            notify("Post link copied. You can share it now.", "success");
+          } else {
+            window.prompt("Copy this post link:", shareData.url);
+          }
         } catch (error) {
-            console.error("Unexpected order submission error:", error);
-            alert("Something went wrong. Please try again.");
-        } finally {
-            if (submitButton) {
-                submitButton.disabled = false;
-                submitButton.textContent = "Send Message";
-            }
+          if (error?.name !== "AbortError") {
+            console.error("Share error:", error);
+            notify("Sharing was cancelled or unavailable.", "warning");
+          }
         }
+      });
     });
-}
+  }
 
+  /* ---------- 8. VIEW PROJECT / ORDER SIMILAR ---------- */
 
+  function setupProjectButtons() {
+    document.querySelectorAll(".work-post").forEach((post) => {
+      const buttons = Array.from(post.querySelectorAll("button"));
 
-    /* =================================================
-       REMEMBER ME
-       LOCAL STORAGE DEMO
-    ================================================= */
+      buttons.forEach((button) => {
+        if (button.dataset.projectActionReady === "true") return;
 
-    const rememberMe =
-        document.getElementById("rememberMe");
+        if (/^view project$/i.test(button.textContent.trim())) {
+          button.dataset.projectActionReady = "true";
 
-    const loginEmail =
-        document.getElementById("loginEmail");
+          button.addEventListener("click", () => {
+            const link = post.querySelector("a[href]");
 
-
-    if (
-        rememberMe &&
-        loginEmail
-    ) {
-
-        const savedEmail =
-            localStorage.getItem(
-                "ruddranilRememberedEmail"
-            );
-
-
-        if (savedEmail) {
-
-            loginEmail.value =
-                savedEmail;
-
-            rememberMe.checked =
-                true;
-
+            if (link) {
+              window.location.href = link.href;
+            } else {
+              notify(
+                "Project details are not linked yet. Add a project URL to this post.",
+                "info"
+              );
+            }
+          });
         }
 
+        if (/^order similar$/i.test(button.textContent.trim())) {
+          button.dataset.projectActionReady = "true";
 
-        rememberMe.addEventListener(
-            "change",
-            () => {
+          button.addEventListener("click", () => {
+            const serviceSelect = document.getElementById("contactService");
+            const contactSection = document.getElementById("contact");
 
-                if (
-                    rememberMe.checked &&
-                    loginEmail.value.trim()
-                ) {
+            if (serviceSelect) {
+              const text = post.textContent.toLowerCase();
 
-                    localStorage.setItem(
-                        "ruddranilRememberedEmail",
-                        loginEmail.value.trim()
-                    );
-
-                } else {
-
-                    localStorage.removeItem(
-                        "ruddranilRememberedEmail"
-                    );
-
-                }
-
+              if (text.includes("website")) serviceSelect.value = "website";
+              else if (text.includes("graphic") || text.includes("design")) {
+                serviceSelect.value = "graphics";
+              } else if (text.includes("seo")) serviceSelect.value = "yt-seo";
+              else if (text.includes("youtube")) serviceSelect.value = "yt-marketing";
+              else if (text.includes("facebook")) serviceSelect.value = "fb-marketing";
             }
-        );
 
+            if (contactSection) {
+              contactSection.scrollIntoView({ behavior: "smooth" });
+            } else {
+              window.location.hash = "contact";
+            }
+
+            notify("Fill in the contact form to request similar work.", "info");
+          });
+        }
+      });
+    });
+  }
+
+  /* ---------- 9. MOBILE MENU ---------- */
+
+  function setupMobileMenu() {
+    const menuButton = document.querySelector(
+      "#menuToggle, #menuBtn, .menu-toggle, .hamburger, [aria-label='Open menu']"
+    );
+
+    const closeButton = document.querySelector(
+      "#closeMenu, .close-menu, .sidebar-close"
+    );
+
+    const sidebar = document.querySelector(
+      "#sidebar, .sidebar, .mobile-menu, .nav-menu"
+    );
+
+    if (!sidebar) return;
+
+    function openMenu() {
+      sidebar.classList.add("active", "open");
+      sidebar.setAttribute("aria-expanded", "true");
+      document.body.classList.add("menu-open");
     }
 
+    function closeMenu() {
+      sidebar.classList.remove("active", "open");
+      sidebar.setAttribute("aria-expanded", "false");
+      document.body.classList.remove("menu-open");
+    }
 
-    /* =================================================
-       SERVICE ORDER BUTTONS
-       TEMPORARY
-    ================================================= */
+    menuButton?.addEventListener("click", openMenu);
+    closeButton?.addEventListener("click", closeMenu);
 
-    const orderButtons =
-        document.querySelectorAll(
-            ".service-order-btn, .post-order-btn"
-        );
-
-
-    orderButtons.forEach((button) => {
-
-        button.addEventListener(
-            "click",
-            () => {
-
-                /*
-                 * Real order system will be connected later.
-                 * For now the button goes to Contact section.
-                 */
-
-            }
-        );
-
+    sidebar.querySelectorAll("a").forEach((link) => {
+      link.addEventListener("click", closeMenu);
     });
 
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") closeMenu();
+    });
+  }
 
-    /* =================================================
-       CURRENT YEAR
-    ================================================= */
+  /* ---------- 10. SMOOTH SCROLL ---------- */
 
-    const currentYear =
-        document.querySelector(
-            ".footer-bottom p"
-        );
+  function setupSmoothScroll() {
+    document.querySelectorAll('a[href^="#"]').forEach((link) => {
+      link.addEventListener("click", (event) => {
+        const href = link.getAttribute("href");
 
+        if (!href || href === "#") return;
 
-    if (currentYear) {
+        const target = document.querySelector(href);
 
-        const year =
-            new Date().getFullYear();
+        if (target) {
+          event.preventDefault();
+          target.scrollIntoView({ behavior: "smooth", block: "start" });
+          history.replaceState(null, "", href);
+        }
+      });
+    });
+  }
 
-        currentYear.innerHTML =
-            currentYear.innerHTML.replace(
-                /©\s*\d{4}/,
-                "© " + year
-            );
+  /* ---------- 11. BACK TO TOP ---------- */
 
+  function setupBackToTop() {
+    const button = document.getElementById("backToTop");
+
+    if (!button) return;
+
+    button.addEventListener("click", () => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+
+    function updateButton() {
+      button.hidden = window.scrollY < 300;
     }
 
+    window.addEventListener("scroll", updateButton, { passive: true });
+    updateButton();
+  }
 
-    /* =================================================
-       PAGE READY
-    ================================================= */
+  /* ---------- 12. REMEMBER ME ---------- */
 
-    document.body.classList.add("js-ready");
+  function setupRememberMe() {
+    const rememberCheckbox = document.querySelector(
+      "#rememberMe, input[name='rememberMe'], input[name='remember']"
+    );
 
-});
+    const emailInput = document.querySelector(
+      "#loginEmail, #email, input[type='email']"
+    );
+
+    if (!rememberCheckbox || !emailInput) return;
+
+    const savedEmail = localStorage.getItem("ruddranil-remembered-email");
+
+    if (savedEmail) {
+      emailInput.value = savedEmail;
+      rememberCheckbox.checked = true;
+    }
+
+    rememberCheckbox.addEventListener("change", () => {
+      if (rememberCheckbox.checked) {
+        localStorage.setItem(
+          "ruddranil-remembered-email",
+          emailInput.value.trim()
+        );
+      } else {
+        localStorage.removeItem("ruddranil-remembered-email");
+      }
+    });
+
+    emailInput.addEventListener("change", () => {
+      if (rememberCheckbox.checked) {
+        localStorage.setItem(
+          "ruddranil-remembered-email",
+          emailInput.value.trim()
+        );
+      }
+    });
+  }
+
+  /* ---------- 13. INITIALIZE ALL FEATURES ---------- */
+
+  function initializeWebsite() {
+    setupLikeButtons();
+    setupCommentButtons();
+    setupShareButtons();
+    setupProjectButtons();
+    setupMobileMenu();
+    setupSmoothScroll();
+    setupBackToTop();
+    setupRememberMe();
+
+    console.log("Ruddranil.io website script initialized.");
+
+    if (!supabaseClient) {
+      console.error(
+        "Supabase client missing. Check that the Supabase CDN loads before script.js."
+      );
+    }
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initializeWebsite);
+  } else {
+    initializeWebsite();
+  }
+
+})();
