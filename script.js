@@ -247,41 +247,26 @@
     return post.dataset.postId;
   }
 
-  function setupLikeButtons() {
-    document.querySelectorAll(".work-post").forEach((post) => {
-      const postId = getPostId(post);
-      const likeButton = Array.from(post.querySelectorAll("button"))
-        .find((button) => /^like\b/i.test(button.textContent.trim()));
+  
+function setupLikeButtons() {
+  document.querySelectorAll(".work-post").forEach((post) => {
+    const postId = getPostId(post);
 
-      if (!likeButton || likeButton.dataset.likeReady === "true") return;
+    const likeButton = Array.from(post.querySelectorAll("button"))
+      .find((button) => /^like\b/i.test(button.textContent.trim()));
 
-      likeButton.dataset.likeReady = "true";
+    if (!likeButton || likeButton.dataset.likeReady === "true") return;
 
-      const key = "ruddranil-liked-" + postId;
-      let liked = localStorage.getItem(key) === "true";
+    likeButton.dataset.likeReady = "true";
 
-      function renderLike() {
-        likeButton.textContent = liked ? "♥ Liked" : "♡ Like";
-        likeButton.setAttribute("aria-pressed", String(liked));
-      }
-
-      renderLike();
-
-      likeButton.addEventListener("click", () => {
-        liked = !liked;
-
-        if (liked) {
-          localStorage.setItem(key, "true");
-          notify("You liked this post.", "success");
-        } else {
-          localStorage.removeItem(key);
-          notify("Like removed.", "info");
-        }
-
-        renderLike();
-      });
+    likeButton.addEventListener("click", async () => {
+      notify(
+        "Supabase Like connection is being configured.",
+        "info"
+      );
     });
-  }
+  });
+}
 
   /* ---------- 6. COMMENTS ---------- */
 
