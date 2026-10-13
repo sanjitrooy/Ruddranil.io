@@ -576,15 +576,11 @@
 
         if (error) throw error;
 
-        if (data.session) {
-          showMessage(
-            "Login successful! Your account is active. Customer dashboard setup is the next step.",
-            "success"
-          );
+       if (data.session) {
+  showMessage("Login successful! Redirecting to your dashboard...", "success");
 
-          // Keep the customer on this page until the dashboard is created.
-          // Do not redirect to a dashboard file that may not exist yet.
-        }
+  window.location.href = "customer-dashboard.html";
+}
       } catch (error) {
         showMessage(error.message || "Login failed. Please check your details.");
       } finally {
