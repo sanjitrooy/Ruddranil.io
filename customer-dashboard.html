@@ -1,4 +1,4 @@
-```html
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,11 +7,7 @@
   <title>Customer Dashboard | Ruddranil.io</title>
 
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
       font-family: Arial, sans-serif;
@@ -30,13 +26,8 @@
       border-bottom: 1px solid #263449;
     }
 
-    header h1 {
-      font-size: 21px;
-    }
-
-    header h1 span {
-      color: #38bdf8;
-    }
+    header h1 { font-size: 21px; }
+    header h1 span { color: #38bdf8; }
 
     button, .btn {
       border: 0;
@@ -48,15 +39,10 @@
       display: inline-block;
     }
 
-    .logout {
-      color: white;
-      background: #dc2626;
-    }
+    button:disabled { opacity: .6; cursor: wait; }
+    .logout { color: white; background: #dc2626; }
 
-    main {
-      width: min(1050px, 92%);
-      margin: 35px auto;
-    }
+    main { width: min(1050px, 92%); margin: 35px auto; }
 
     .welcome {
       padding: 27px;
@@ -65,15 +51,8 @@
       margin-bottom: 24px;
     }
 
-    .welcome h2 {
-      margin-bottom: 10px;
-      font-size: 27px;
-    }
-
-    .welcome p {
-      line-height: 1.7;
-      color: #e0f2fe;
-    }
+    .welcome h2 { margin-bottom: 10px; font-size: 27px; }
+    .welcome p { line-height: 1.7; color: #e0f2fe; }
 
     .grid {
       display: grid;
@@ -86,17 +65,121 @@
       border: 1px solid #263449;
       border-radius: 15px;
       padding: 23px;
+      min-width: 0;
     }
 
-    .card h3 {
-      color: #7dd3fc;
-      margin-bottom: 12px;
-    }
-
+    .card h3 { color: #7dd3fc; margin-bottom: 12px; }
     .card p {
       color: #cbd5e1;
       line-height: 1.8;
       overflow-wrap: anywhere;
+    }
+
+    .orders-section { margin-top: 24px; }
+
+    .section-heading {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 15px;
+    }
+
+    .section-heading h2 { font-size: 22px; }
+
+    .refresh-btn {
+      color: white;
+      background: #334155;
+    }
+
+    .order-list {
+      display: grid;
+      gap: 15px;
+    }
+
+    .order-card {
+      background: #111827;
+      border: 1px solid #263449;
+      border-radius: 15px;
+      padding: 20px;
+      overflow-wrap: anywhere;
+    }
+
+    .order-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+
+    .order-id { color: #7dd3fc; font-weight: bold; }
+
+    .pill {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: bold;
+      background: #334155;
+      color: #e2e8f0;
+    }
+
+    .pill.completed { background: #14532d; color: #bbf7d0; }
+    .pill.progress { background: #1e3a8a; color: #bfdbfe; }
+    .pill.pending { background: #713f12; color: #fef3c7; }
+    .pill.cancelled { background: #7f1d1d; color: #fecaca; }
+
+    .order-details {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 10px;
+      margin: 12px 0;
+    }
+
+    .detail {
+      background: #0b1120;
+      border-radius: 9px;
+      padding: 12px;
+    }
+
+    .detail small {
+      display: block;
+      color: #94a3b8;
+      margin-bottom: 6px;
+    }
+
+    .detail strong { font-size: 14px; }
+
+    .progress-track {
+      height: 9px;
+      border-radius: 999px;
+      background: #263449;
+      overflow: hidden;
+      margin: 9px 0 6px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0;
+      background: linear-gradient(90deg, #06b6d4, #3b82f6);
+      border-radius: inherit;
+      transition: width .3s ease;
+    }
+
+    .progress-label {
+      color: #cbd5e1;
+      font-size: 13px;
+    }
+
+    .empty-state {
+      padding: 24px;
+      border: 1px dashed #475569;
+      border-radius: 14px;
+      color: #cbd5e1;
+      line-height: 1.7;
+      text-align: center;
     }
 
     .actions {
@@ -106,34 +189,21 @@
       gap: 12px;
     }
 
-    .primary {
-      color: white;
-      background: #2563eb;
-    }
-
-    .secondary {
-      color: white;
-      background: #334155;
-    }
+    .primary { color: white; background: #2563eb; }
+    .secondary { color: white; background: #334155; }
 
     #status {
       margin-top: 20px;
       color: #fbbf24;
       line-height: 1.7;
+      overflow-wrap: anywhere;
     }
 
     @media (max-width: 480px) {
-      header {
-        padding: 17px 4%;
-      }
-
-      header h1 {
-        font-size: 17px;
-      }
-
-      .welcome h2 {
-        font-size: 23px;
-      }
+      header { padding: 17px 4%; }
+      header h1 { font-size: 17px; }
+      .welcome h2 { font-size: 23px; }
+      .card, .order-card { padding: 17px; }
     }
   </style>
 </head>
@@ -147,10 +217,7 @@
   <main>
     <section class="welcome">
       <h2 id="welcomeName">Welcome, Customer!</h2>
-      <p>
-        Welcome to your customer dashboard.
-        Manage your account and access your project services here.
-      </p>
+      <p>Manage your account, view your project orders, and track progress here.</p>
     </section>
 
     <section class="grid">
@@ -162,18 +229,30 @@
 
       <article class="card">
         <h3>My Orders</h3>
-        <p>Your submitted project requests will be connected here in the next step.</p>
+        <p>Total orders: <strong id="orderCount">—</strong></p>
+        <p>See your submitted requests below.</p>
       </article>
 
       <article class="card">
         <h3>Work Tracking</h3>
-        <p>Order ID and project completion progress will be connected here next.</p>
+        <p>Your progress below reflects the latest status saved for each order.</p>
       </article>
 
       <article class="card">
         <h3>Customer Reviews</h3>
-        <p>After an order is completed, the review and rating option will be added.</p>
+        <p>Customer reviews and ratings will be added in a future update.</p>
       </article>
+    </section>
+
+    <section class="orders-section">
+      <div class="section-heading">
+        <h2>My Orders &amp; Tracking</h2>
+        <button class="refresh-btn" id="refreshOrdersBtn">Refresh</button>
+      </div>
+
+      <div id="ordersList" class="order-list">
+        <div class="empty-state">Loading your orders...</div>
+      </div>
     </section>
 
     <div class="actions">
@@ -188,29 +267,172 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <script>
-    const SUPABASE_URL =
-      "https://udvvhqjgotwvqfjnfnrn.supabase.co";
-
-    // Use the SAME project's publishable key as login.html.
-    const SUPABASE_PUBLISHABLE_KEY =
-      "sb_publishable_oiH3zhFQpyVyxqrlvtRmOA_jPeFsdLV";
+    const SUPABASE_URL = "https://udvvhqjgotwvqfjnfnrn.supabase.co";
+    const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_oiH3zhFQpyVyxqrlvtRmOA_jPeFsdLV";
 
     const statusBox = document.getElementById("status");
+    const ordersList = document.getElementById("ordersList");
+    const refreshButton = document.getElementById("refreshOrdersBtn");
+    const logoutButton = document.getElementById("logoutBtn");
+
+    const client = window.supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_PUBLISHABLE_KEY
+    );
+
+    function safeText(value, fallback = "Not available") {
+      return value == null || value === "" ? fallback : String(value);
+    }
+
+    function formatDate(value) {
+      if (!value) return "Not available";
+
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return "Not available";
+
+      return date.toLocaleString(undefined, {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit"
+      });
+    }
+
+    function statusClass(value) {
+      const status = String(value || "").toLowerCase();
+
+      if (status === "completed") return "completed";
+      if (status === "in progress" || status === "review") return "progress";
+      if (status === "cancelled") return "cancelled";
+
+      return "pending";
+    }
+
+    function renderOrders(orders) {
+      document.getElementById("orderCount").textContent = orders.length;
+
+      if (!orders.length) {
+        ordersList.innerHTML = `
+          <div class="empty-state">
+            You have no orders yet.<br>
+            Browse Services and submit a request to get started.
+          </div>
+        `;
+        return;
+      }
+
+      ordersList.replaceChildren();
+
+      orders.forEach((order) => {
+        const card = document.createElement("article");
+        card.className = "order-card";
+
+        const top = document.createElement("div");
+        top.className = "order-top";
+
+        const id = document.createElement("p");
+        id.className = "order-id";
+        id.textContent = "Order ID: " + safeText(order.order_id);
+
+        const badge = document.createElement("span");
+        badge.className = "pill " + statusClass(order.status);
+        badge.textContent = safeText(order.status, "Pending");
+
+        top.append(id, badge);
+
+        const details = document.createElement("div");
+        details.className = "order-details";
+
+        const fields = [
+          ["Service", order.service],
+          ["Order Date", formatDate(order.created_at)],
+          ["Last Updated", formatDate(order.updated_at)]
+        ];
+
+        fields.forEach(([label, value]) => {
+          const item = document.createElement("div");
+          item.className = "detail";
+
+          const small = document.createElement("small");
+          small.textContent = label;
+
+          const strong = document.createElement("strong");
+          strong.textContent = safeText(value);
+
+          item.append(small, strong);
+          details.append(item);
+        });
+
+        const message = document.createElement("p");
+        message.style.marginTop = "12px";
+        message.textContent = "Request: " + safeText(order.message);
+
+        const progressHeading = document.createElement("p");
+        progressHeading.style.marginTop = "15px";
+        progressHeading.textContent = "Project progress";
+
+        const track = document.createElement("div");
+        track.className = "progress-track";
+        track.setAttribute("role", "progressbar");
+        track.setAttribute("aria-label", "Project progress");
+        track.setAttribute("aria-valuemin", "0");
+        track.setAttribute("aria-valuemax", "100");
+
+        const fill = document.createElement("div");
+        fill.className = "progress-fill";
+
+        let progress = Number(order.progress);
+        if (!Number.isFinite(progress)) progress = 0;
+        progress = Math.max(0, Math.min(100, progress));
+
+        fill.style.width = progress + "%";
+        track.setAttribute("aria-valuenow", String(progress));
+        track.append(fill);
+
+        const progressLabel = document.createElement("p");
+        progressLabel.className = "progress-label";
+        progressLabel.textContent = progress + "% completed";
+
+        card.append(top, details, message, progressHeading, track, progressLabel);
+        ordersList.append(card);
+      });
+    }
+
+    async function loadOrders(userId) {
+      ordersList.innerHTML = '<div class="empty-state">Loading your orders...</div>';
+      refreshButton.disabled = true;
+      statusBox.textContent = "";
+
+      try {
+        const { data, error } = await client
+          .from("orders")
+          .select("order_id, service, message, status, progress, created_at, updated_at")
+          .eq("customer_id", userId)
+          .order("created_at", { ascending: false });
+
+        if (error) throw error;
+
+        renderOrders(data || []);
+      } catch (error) {
+        console.error("Could not load orders:", error);
+        ordersList.innerHTML = `
+          <div class="empty-state">
+            Your orders could not be loaded. Please refresh and try again.
+          </div>
+        `;
+        statusBox.textContent =
+          "Orders error: " + safeText(error.message, "Unknown error");
+      } finally {
+        refreshButton.disabled = false;
+      }
+    }
 
     async function initDashboard() {
       try {
         if (!window.supabase) {
           throw new Error("Supabase library did not load. Refresh the page.");
         }
-
-        if (SUPABASE_PUBLISHABLE_KEY.includes("PASTE_YOUR_")) {
-          throw new Error("Add your Supabase publishable key before using this page.");
-        }
-
-        const client = window.supabase.createClient(
-          SUPABASE_URL,
-          SUPABASE_PUBLISHABLE_KEY
-        );
 
         const { data, error } = await client.auth.getUser();
 
@@ -222,32 +444,41 @@
         const user = data.user;
         const name = user.user_metadata?.full_name || "Customer";
 
-        document.getElementById("welcomeName").textContent =
-          "Welcome, " + name + "!";
-
+        document.getElementById("welcomeName").textContent = "Welcome, " + name + "!";
         document.getElementById("customerName").textContent = name;
         document.getElementById("customerEmail").textContent =
           user.email || "Not available";
 
+        await loadOrders(user.id);
       } catch (error) {
-        statusBox.textContent = error.message;
+        console.error("Dashboard initialization failed:", error);
+        statusBox.textContent = safeText(error.message, "Dashboard could not be loaded.");
       }
     }
 
-    document.getElementById("logoutBtn").addEventListener("click", async () => {
+    refreshButton.addEventListener("click", async () => {
+      const { data, error } = await client.auth.getUser();
+
+      if (error || !data.user) {
+        window.location.replace("login.html");
+        return;
+      }
+
+      await loadOrders(data.user.id);
+    });
+
+    logoutButton.addEventListener("click", async () => {
+      logoutButton.disabled = true;
+      statusBox.textContent = "Logging out...";
+
       try {
-        const client = window.supabase.createClient(
-          SUPABASE_URL,
-          SUPABASE_PUBLISHABLE_KEY
-        );
-
         const { error } = await client.auth.signOut();
-
         if (error) throw error;
 
         window.location.replace("login.html");
       } catch (error) {
-        statusBox.textContent = error.message;
+        statusBox.textContent = "Logout failed: " + safeText(error.message);
+        logoutButton.disabled = false;
       }
     });
 
@@ -255,4 +486,3 @@
   </script>
 </body>
 </html>
-```
