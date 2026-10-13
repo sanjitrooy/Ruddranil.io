@@ -425,65 +425,118 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
-    /* =================================================
-       LOGIN FORM
-       TEMPORARY FRONT-END HANDLER
-    ================================================= */
+    
+/* =================================================
+   CONTACT FORM
+   SUPABASE ORDER SUBMISSION
+================================================= */
 
-    const loginForm =
-        document.getElementById("loginForm");
+const contactForm = document.getElementById("contactForm");
 
-    if (loginForm) {
+if (contactForm) {
+    contactForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
 
-        loginForm.addEventListener(
-            "submit",
-            (event) => {
+        const name = document.getElementById("contactName");
+        const email = document.getElementById("contactEmail");
+        const service = document.getElementById("contactService");
+        const message = document.getElementById("contactMessage");
 
-                event.preventDefault();
+        if (!name || !email || !service || !message) {
+            alert("Contact form fields could not be found.");
+            return;
+        }
 
-                const email =
-                    document.getElementById(
-                        "loginEmail"
-                    );
+        if (
+            !name.value.trim() ||
+            !email.value.trim() ||
+            !service.value ||
+            !message.value.trim()
+        ) {
+            alert("Please complete all required fields.");
+            return;
+        }
 
-                const password =
-                    document.getElementById(
-                        "loginPassword"
-                    );
+        if (!window.supabase) {
+            alert("Supabase library did not load. Please refresh and try again.");
+            return;
+        }
 
+        // Use the URL and publishable key from your correct Supabase project.
+        const SUPABASE_URL = "https://udvvhqjgotwvqfjnfnrn.supabase.co";
+        const SUPABASE_PUBLISHABLE_KEY = "PASTE_YOUR_UDVV_PROJECT_PUBLISHABLE_KEY_HERE";
 
-                if (
-                    !email ||
-                    !password
-                ) {
+        if (
+            !SUPABASE_PUBLISHABLE_KEY ||
+            SUPABASE_PUBLISHABLE_KEY === "sb_publishable_oiH3zhFQpyVyxqrlvtRmOA_jPeFsdLV";
+        ) {
+            alert("Please add your Supabase publishable key in script.js first.");
+            return;
+        }
 
-                    return;
+        const submitButton = contactForm.querySelector('button[type="submit"]');
 
-                }
-
-
-                if (
-                    !email.value.trim() ||
-                    !password.value.trim()
-                ) {
-
-                    alert(
-                        "Please enter your email and password."
-                    );
-
-                    return;
-
-                }
-
-
-                alert(
-                    "Login system will be connected to the secure account system soon."
-                );
-
+        try {
+            if (submitButton) {
+                submitButton.disabled = true;
+                submitButton.textContent = "Submitting...";
             }
-        );
 
-    }
+            const supabaseClient = window.supabase.createClient(
+                SUPABASE_URL,
+                SUPABASE_PUBLISHABLE_KEY
+            );
+
+            const { data: userResult, error: userError } =
+                await supabaseClient.auth.getUser();
+
+            if (userError || !userResult.user) {
+                alert("Please log in before placing an order.");
+                window.location.href = "login.html";
+                return;
+            }
+
+            const user = userResult.user;
+
+            const { data: order, error: orderError } =
+                await supabaseClient
+                    .from("orders")
+                    .insert({
+                        customer_id: user.id,
+                        customer_name: name.value.trim(),
+                        customer_email: email.value.trim(),
+                        service: service.value,
+                        message: message.value.trim()
+                    })
+                    .select("order_id")
+                    .single();
+
+            if (orderError) {
+                console.error("Order submission error:", orderError);
+                alert("Order could not be submitted. Please check your Supabase key, login session, and orders table permissions.");
+                return;
+            }
+
+            alert(
+                "Thank you, " + name.value.trim() +
+                "! Your order was submitted successfully.\nOrder ID: " +
+                order.order_id
+            );
+
+            contactForm.reset();
+
+        } catch (error) {
+            console.error("Unexpected order submission error:", error);
+            alert("Something went wrong. Please try again.");
+        } finally {
+            if (submitButton) {
+                submitButton.disabled = false;
+                submitButton.textContent = "Send Message";
+            }
+        }
+    });
+}
+
 
 
     /* =================================================
