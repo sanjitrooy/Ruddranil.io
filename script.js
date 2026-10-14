@@ -230,25 +230,52 @@
     });
   }
 
-  /* ---------- 5. LIKE / UNLIKE ---------- */
 
-  function getPostId(post) {
-    if (post.dataset.postId) return post.dataset.postId;
+/* ---------- 5. LIKE / UNLIKE ---------- */
 
-    const heading = post.querySelector("h2, h3, h4");
-    const title = heading?.textContent?.trim() || "work-post";
+function getPostId(post) {
+  if (post.dataset.postId) return post.dataset.postId;
 
-    const allPosts = Array.from(document.querySelectorAll(".work-post"));
-    const index = allPosts.indexOf(post);
+  const heading = post.querySelector("h2, h3, h4");
+  const title = heading?.textContent?.trim() || "work-post";
 
-    post.dataset.postId = "post-" + index + "-" +
-      title.toLowerCase().replace(/[^a-z0-9]+/g, "-").slice(0, 50);
+  const allPosts = Array.from(document.querySelectorAll(".work-post"));
+  const index = allPosts.indexOf(post);
 
-    return post.dataset.postId;
+  post.dataset.postId =
+    "post-" + index + "-" +
+    title.toLowerCase().replace(/[^a-z0-9]+/g, "-").slice(0, 50);
+
+  return post.dataset.postId;
+}
+
+async function ensureLikeUser() {
+  if (!supabaseClient) {
+    throw new Error("Supabase client did not load.");
   }
 
-  
-function setupLikeButtons() {
+  const { data: sessionData, error: sessionError } =
+    await supabaseClient.auth.getSession();
+
+  if (sessionError) throw sessionError;
+
+  if (sessionData.session?.user) {
+    return sessionData.session.user;
+  }
+
+  const { data, error } =
+    await supabaseClient.auth.signInAnonymously();
+
+  if (error) throw error;
+
+  if (!data.user) {
+    throw new Error("Could not create an anonymous user.");
+  }
+
+  return data.user;
+}
+
+async function setupLikeButtons() {
   document.querySelectorAll(".work-post").forEach((post) => {
     const postId = getPostId(post);
 
@@ -259,18 +286,131 @@ function setupLikeButtons() {
 
     likeButton.dataset.likeReady = "true";
 
+    const originalLabel = likeButton.textContent.trim() || "Like";
+    likeButton.disabled = false;
+
+    async function refreshLike() {
+      const { count, error: countError } = await supabaseClient
+        .from("post_likes")
+        .select("*", { count: "exact", head: true })
+        .eq("post_id", postId);
+
+      if (countError) throw countError;
+
+      let likedByMe = false;
+
+      const { data: sessionData, error: sessionError } =
+        await supabaseClient.auth.getSession();
+
+      if (sessionError) throw sessionError;
+
+      const user = sessionData.session?.user;
+
+      if (user) {
+        const { data, error } = await supabaseClient
+          .from("post_likes")
+          .select("id")
+          .eq("post_id", postId)
+          .eq("user_id", user.id)
+          .maybeSingle();
+
+        if (error) throw error;
+        likedByMe = Boolean(data);
+      }
+
+      likeButton.textContent =
+        (likedByMe ? "♥ Liked" : "♡ Like") +
+        " (" + (count || 0) + ")";
+
+      likeButton.setAttribute("aria-pressed", String(likedByMe));
+      likeButton.dataset.liked = String(likedByMe);
+    }
+
     likeButton.addEventListener("click", async () => {
-      notify(
-        "Supabase Like connection is being configured.",
-        "info"
-      );
+      if (likeButton.disabled) return;
+
+      likeButton.disabled = true;
+
+      try {
+        const user = await ensureLikeUser();
+
+        const { data: existingLike, error: findError } =
+          await supabaseClient
+            .from("post_likes")
+            .select("id")
+            .eq("post_id", postId)
+            .eq("user_id", user.id)
+            .maybeSingle();
+
+        if (findError) throw findError;
+
+        if (existingLike) {
+          const { error } = await supabaseClient
+            .from("post_likes")
+            .delete()
+            .eq("id", existingLike.id);
+
+          if (error) throw error;
+        } else {
+          const { error } = await supabaseClient
+            .from("post_likes")
+            .insert({
+              post_id: postId,
+              user_id: user.id
+            });
+
+          if (error) throw error;
+        }
+
+        await refreshLike();
+        notify("Like updated successfully.", "success");
+      } catch (error) {
+        console.error("Like error:", error);
+        notify(
+          "Like failed: " + (error.message || "Unknown error"),
+          "error"
+        );
+      } finally {
+        likeButton.disabled = false;
+      }
     });
+
+    if (supabaseClient) {
+      refreshLike().catch((error) => {
+        console.error("Could not load likes:", error);
+        likeButton.textContent = originalLabel;
+      });
+    } else {
+      likeButton.textContent = originalLabel;
+    }
   });
 }
 
-
     
-/* ---------- COMMENTS: SUPABASE ---------- */
+
+/* ---------- 6. COMMENTS: SUPABASE ---------- */
+
+async function ensureCommentUser() {
+  const { data: sessionData, error: sessionError } =
+    await supabaseClient.auth.getSession();
+
+  if (sessionError) throw sessionError;
+
+  if (sessionData.session?.user) {
+    return sessionData.session.user;
+  }
+
+  const { data, error } =
+    await supabaseClient.auth.signInAnonymously();
+
+  if (error) throw error;
+
+  if (!data.user) {
+    throw new Error("Anonymous sign-in failed.");
+  }
+
+  return data.user;
+}
 
 function setupCommentButtons() {
   if (!supabaseClient) {
@@ -281,21 +421,18 @@ function setupCommentButtons() {
   document.querySelectorAll(".work-post").forEach((post) => {
     const postId = getPostId(post);
 
-    const commentButton = Array.from(
-      post.querySelectorAll("button")
-    ).find((button) =>
-      /^comment\b/i.test(button.textContent.trim())
-    );
+    const commentButton = Array.from(post.querySelectorAll("button"))
+      .find((button) =>
+        /^comment\b/i.test(button.textContent.trim())
+      );
 
     if (
       !commentButton ||
       commentButton.dataset.commentReady === "true"
-    ) {
-      return;
-    }
+    ) return;
 
     commentButton.dataset.commentReady = "true";
-    commentButton.innerHTML = "💬 Comment";
+    commentButton.textContent = "💬 Comment";
 
     const panel = document.createElement("div");
     panel.className = "comment-panel";
@@ -309,7 +446,6 @@ function setupCommentButtons() {
     });
 
     const list = document.createElement("div");
-
     const form = document.createElement("form");
 
     Object.assign(form.style, {
@@ -324,14 +460,12 @@ function setupCommentButtons() {
     nameInput.maxLength = 80;
     nameInput.required = true;
     nameInput.autocomplete = "name";
-    nameInput.setAttribute("aria-label", "Your name");
 
     const commentInput = document.createElement("textarea");
     commentInput.placeholder = "Write a comment...";
     commentInput.maxLength = 1000;
     commentInput.required = true;
     commentInput.rows = 3;
-    commentInput.setAttribute("aria-label", "Write a comment");
 
     const submitButton = document.createElement("button");
     submitButton.type = "submit";
@@ -348,13 +482,6 @@ function setupCommentButtons() {
       });
     });
 
-    Object.assign(submitButton.style, {
-      padding: "10px 16px",
-      border: "0",
-      borderRadius: "9px",
-      cursor: "pointer"
-    });
-
     async function loadComments() {
       list.replaceChildren();
 
@@ -362,52 +489,56 @@ function setupCommentButtons() {
       loading.textContent = "Loading comments...";
       list.appendChild(loading);
 
-      const { data, error } = await supabaseClient
-        .from("post_comments")
-        .select("id, display_name, comment_text, created_at")
-        .eq("post_id", postId)
-        .order("created_at", { ascending: false });
+      try {
+        const { data, error } = await supabaseClient
+          .from("post_comments")
+          .select("id, display_name, comment_text, created_at")
+          .eq("post_id", postId)
+          .order("created_at", { ascending: true });
 
-      list.replaceChildren();
+        if (error) throw error;
 
-      if (error) {
-        console.error("Load comments error:", error);
-        const message = document.createElement("p");
-        message.textContent = "Could not load comments. Please try again.";
-        list.appendChild(message);
-        return;
-      }
+        list.replaceChildren();
 
-      if (!data || data.length === 0) {
-        const message = document.createElement("p");
-        message.textContent = "No comments yet. Be the first to comment!";
-        list.appendChild(message);
-        return;
-      }
+        if (!data || data.length === 0) {
+          const empty = document.createElement("p");
+          empty.textContent = "No comments yet.";
+          list.appendChild(empty);
+          return;
+        }
 
-      data.forEach((comment) => {
-        const item = document.createElement("div");
+        data.forEach((comment) => {
+          const item = document.createElement("div");
 
-        Object.assign(item.style, {
-          padding: "12px 0",
-          borderBottom: "1px solid rgba(127,127,127,.25)"
+          Object.assign(item.style, {
+            padding: "10px 0",
+            borderBottom: "1px solid rgba(127,127,127,.25)"
+          });
+
+          const name = document.createElement("strong");
+          name.textContent = comment.display_name || "Visitor";
+
+          const text = document.createElement("p");
+          text.textContent = comment.comment_text;
+          text.style.margin = "5px 0";
+
+          const date = document.createElement("small");
+          date.textContent = comment.created_at
+            ? new Date(comment.created_at).toLocaleString()
+            : "";
+
+          item.append(name, text, date);
+          list.appendChild(item);
         });
+      } catch (error) {
+        console.error("Load comments error:", error);
+        list.replaceChildren();
 
-        const author = document.createElement("strong");
-        author.textContent = comment.display_name || "Visitor";
-
-        const body = document.createElement("p");
-        body.textContent = comment.comment_text;
-        body.style.margin = "6px 0";
-
-        const date = document.createElement("small");
-        date.textContent = comment.created_at
-          ? new Date(comment.created_at).toLocaleString()
-          : "";
-
-        item.append(author, body, date);
-        list.appendChild(item);
-      });
+        const message = document.createElement("p");
+        message.textContent =
+          "Could not load comments. Please check Supabase permissions.";
+        list.appendChild(message);
+      }
     }
 
     form.append(nameInput, commentInput, submitButton);
@@ -430,7 +561,7 @@ function setupCommentButtons() {
       const commentText = commentInput.value.trim();
 
       if (!displayName || displayName.length > 80) {
-        notify("Enter a name (maximum 80 characters).", "warning");
+        notify("Enter your name (maximum 80 characters).", "warning");
         return;
       }
 
@@ -443,26 +574,28 @@ function setupCommentButtons() {
       submitButton.textContent = "Posting...";
 
       try {
+        const user = await ensureCommentUser();
+
         const { error } = await supabaseClient
           .from("post_comments")
           .insert({
             post_id: postId,
             display_name: displayName,
             comment_text: commentText,
-            user_id: (
-              await supabaseClient.auth.getUser()
-            ).data.user?.id
+            user_id: user.id
           });
 
         if (error) throw error;
 
         commentInput.value = "";
         await loadComments();
+
         notify("Comment posted successfully!", "success");
       } catch (error) {
         console.error("Post comment error:", error);
+
         notify(
-          "Comment could not be posted. Check Supabase permissions and anonymous sign-in.",
+          "Comment failed: " + (error.message || "Check Supabase settings."),
           "error"
         );
       } finally {
