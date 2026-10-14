@@ -561,7 +561,6 @@ function setupRememberMe() {
 
 function initializeWebsite() {
   const features = [
-    ["Contact form", setupContactForm],
     ["Like buttons", setupLikeButtons],
     ["Comment buttons", setupCommentButtons],
     ["Share buttons", setupShareButtons],
@@ -572,8 +571,12 @@ function initializeWebsite() {
     ["Remember me", setupRememberMe]
   ];
 
+  console.log("Initializing Ruddranil.io...");
+
   features.forEach(([name, setup]) => {
     try {
+      console.log("Starting:", name);
+
       const result = setup();
 
       if (result && typeof result.catch === "function") {
@@ -581,22 +584,18 @@ function initializeWebsite() {
           console.error(name + " initialization failed:", error);
         });
       }
+
+      console.log("Initialized:", name);
     } catch (error) {
       console.error(name + " initialization failed:", error);
     }
   });
 
-  console.log("Ruddranil.io website script initialized.");
-
   if (!supabaseClient) {
-    console.error(
-      "Supabase client missing. Check that the Supabase CDN loads before script.js."
-    );
-
-    notify(
-      "Supabase did not load. Like, Comment, and Order features need a connection.",
-      "error"
-    );
+    console.error("Supabase client is missing.");
+    notify("Supabase connection is unavailable.", "error");
+  } else {
+    console.log("Supabase client exists.");
   }
 }
 
@@ -605,5 +604,4 @@ if (document.readyState === "loading") {
 } else {
   initializeWebsite();
 }
-
 })();
