@@ -1,4 +1,4 @@
-    if (!likeButton || likeButton.dataset.likeReady === "true") return;
+   if (!likeButton || likeButton.dataset.likeReady === "true") return;
 
     likeButton.dataset.likeReady = "true";
     const originalLabel = (likeButton.textContent || "").trim() || "Like";
