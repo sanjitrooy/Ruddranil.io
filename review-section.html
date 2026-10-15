@@ -1,0 +1,124 @@
+
+<section id="review-section" class="review-section">
+  <div class="review-card">
+    <h2>⭐ Review Your Completed Work</h2>
+    <p>Share your experience after your project is completed.</p>
+
+    <form id="reviewForm">
+      <label for="reviewOrderId">Order ID</label>
+      <input
+        id="reviewOrderId"
+        type="text"
+        placeholder="Enter your Order ID"
+        required
+      />
+
+      <label>Your Rating</label>
+      <div class="star-rating" id="starRating">
+        <button type="button" data-rating="1" aria-label="1 star">☆</button>
+        <button type="button" data-rating="2" aria-label="2 stars">☆</button>
+        <button type="button" data-rating="3" aria-label="3 stars">☆</button>
+        <button type="button" data-rating="4" aria-label="4 stars">☆</button>
+        <button type="button" data-rating="5" aria-label="5 stars">☆</button>
+      </div>
+
+      <input id="reviewRating" type="hidden" value="0" />
+
+      <label for="reviewComment">Your Comment</label>
+      <textarea
+        id="reviewComment"
+        placeholder="Write your experience..."
+        minlength="1"
+        maxlength="1000"
+        required
+      ></textarea>
+
+      <label for="reviewImage">Upload Image (optional)</label>
+      <input
+        id="reviewImage"
+        type="file"
+        accept="image/jpeg,image/png,image/webp"
+      />
+
+      <p id="reviewMessage" role="status"></p>
+
+      <button type="submit" id="submitReview">
+        Submit Review
+      </button>
+    </form>
+  </div>
+</section>
+
+<style>
+.review-section {
+  max-width: 650px;
+  margin: 35px auto;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+.review-card {
+  padding: 26px;
+  background: #fff;
+  color: #172033;
+  border: 1px solid #e5e7eb;
+  border-radius: 18px;
+  box-shadow: 0 10px 35px #0000000d;
+}
+
+.review-card h2 {
+  margin-top: 0;
+}
+
+.review-card label {
+  display: block;
+  margin: 18px 0 8px;
+  font-weight: 600;
+}
+
+.review-card input:not([type="hidden"]),
+.review-card textarea {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 9px;
+  font: inherit;
+}
+
+.review-card textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.star-rating {
+  display: flex;
+  gap: 8px;
+}
+
+.star-rating button {
+  border: 0;
+  background: transparent;
+  color: #f59e0b;
+  font-size: 36px;
+  cursor: pointer;
+}
+
+#submitReview {
+  width: 100%;
+  margin-top: 20px;
+  padding: 13px;
+  border: 0;
+  border-radius: 9px;
+  background: #087f5b;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+#submitReview:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+</style>
