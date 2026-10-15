@@ -1,608 +1,843 @@
-   if (!likeButton || likeButton.dataset.likeReady === "true") return;
+/* =====================================================
+   RUDDRANIL.IO — MAIN WEBSITE SCRIPT
+   Supabase Orders + Like + Comment + Share
+   ===================================================== */
 
-    likeButton.dataset.likeReady = "true";
-    const originalLabel = (likeButton.textContent || "").trim() || "Like";
-    if (likeButton.tagName === "BUTTON") likeButton.type = "button";
-    likeButton.disabled = false;
+(() => {
+  "use strict";
 
-    async function refreshLike() {
-      const { count, error: countError } = await supabaseClient
-        .from("post_likes")
-        .select("*", { count: "exact", head: true })
-        .eq("post_id", postId);
+  /* 1. SUPABASE CONFIGURATION */
 
-      if (countError) throw countError;
+  const SUPABASE_URL =
+    "https://udvvhqjgotwvqfjnfnrn.supabase.co";
 
-      const { data: sessionData, error: sessionError } =
-        await supabaseClient.auth.getSession();
+  const SUPABASE_KEY =
+    "sb_publishable_oiH3zhFQpyVyxqrlvtRmOA_jPeFsdLV";
 
-      if (sessionError) throw sessionError;
+  let supabaseClient = null;
 
-      const user = sessionData?.session?.user;
-      let likedByMe = false;
-
-      if (user) {
-        const { data, error } = await supabaseClient
-          .from("post_likes")
-          .select("id")
-          .eq("post_id", postId)
-          .eq("user_id", user.id)
-          .maybeSingle();
-
-    if (error) throw error;
-      likedByMe = Boolean(data);
+  try {
+    if (window.supabase?.createClient) {
+      supabaseClient = window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY
+      );
+    } else {
+      console.error(
+        "Supabase CDN missing. Check index.html."
+      );
     }
-
-    likeButton.textContent =
-      (likedByMe ? "♥ Liked" : "♡ Like") + " (" + (count || 0) + ")";
-
-    likeButton.setAttribute("aria-pressed", String(likedByMe));
-    likeButton.dataset.liked = String(likedByMe);
+  } catch (error) {
+    console.error("Supabase initialization failed:", error);
   }
 
-  likeButton.addEventListener("click", async (event) => {
-    event.preventDefault();
+  /* 2. NOTIFICATION SYSTEM */
 
-    if (likeButton.dataset.processing === "true") return;
+  function notify(message, type = "info") {
+    let box = document.getElementById("siteNotification");
 
-    likeButton.dataset.processing = "true";
-    likeButton.disabled = true;
-     
-      try {
-        const user = await ensureLikeUser();
-        const currentlyLiked = likeButton.dataset.liked === "true";
+    if (!box) {
+      box = document.createElement("div");
+      box.id = "siteNotification";
 
-        if (currentlyLiked) {
-          const { error } = await supabaseClient
-            .from("post_likes")
-            .delete()
-            .eq("post_id", postId)
-            .eq("user_id", user.id);
+      Object.assign(box.style, {
+        position: "fixed",
+        top: "20px",
+        right: "20px",
+        zIndex: "999999",
+        maxWidth: "min(390px, calc(100vw - 40px))",
+        padding: "15px 18px",
+        borderRadius: "12px",
+        color: "#fff",
+        fontSize: "14px",
+        lineHeight: "1.5",
+        boxShadow: "0 8px 30px rgba(0,0,0,.25)",
+        display: "none",
+        overflowWrap: "anywhere"
+      });
 
-          if (error) throw error;
-          notify("Like removed.", "info");
-        } else {
-          const { error } = await supabaseClient
-            .from("post_likes")
-            .insert({
-              post_id: postId,
-              user_id: user.id
-            });
+      document.body.appendChild(box);
+    }
 
-          if (error && !String(error.code).includes("23505")) {
-            throw error;
-          }
+    const colors = {
+      success: "#16803d",
+      error: "#b42318",
+      info: "#2457c5",
+      warning: "#9a6700"
+    };
 
-          notify("You liked this post.", "success");
-        }
+    box.style.background = colors[type] || colors.info;
+    box.textContent = message;
+    box.style.display = "block";
 
-        await refreshLike();
-      } catch (error) {
-        console.error("Like action failed:", error);
-        notify(
-          "Like failed: " + (error.message || "Check Supabase settings."),
-          "error"
-        );
-      } finally {
-        likeButton.disabled = false;
-        likeButton.dataset.processing = "false";
-      }
-    });
+    if (box._hideTimer) {
+      clearTimeout(box._hideTimer);
+    }
 
-    refreshLike().catch((error) => {
-      console.error("Could not load like count:", error);
-      likeButton.textContent = originalLabel;
-    });
-  });
-}
+    box._hideTimer = setTimeout(() => {
+      box.style.display = "none";
+    }, 6000);
+  }
 
-/* ---------- 6. COMMENTS ---------- */
+  /* 3. POST HELPERS */
 
-async function ensureCommentUser() {
-  if (!supabaseClient) throw new Error("Supabase client did not load.");
+  function getPostId(post) {
+    if (!post) return "work-post";
 
-  const { data: sessionData, error: sessionError } =
-    await supabaseClient.auth.getSession();
+    if (post.dataset.postId) {
+      return post.dataset.postId;
+    }
 
-  if (sessionError) throw sessionError;
-  if (sessionData?.session?.user) return sessionData.session.user;
+    const heading = post.querySelector("h2, h3, h4");
+    const title = heading?.textContent?.trim() || "work-post";
 
-  const { data, error } = await supabaseClient.auth.signInAnonymously();
+    const slug = title
+      .toLowerCase()
+      .normalize("NFKD")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+      .slice(0, 50) || "work-post";
 
-  if (error) throw error;
-  if (!data?.user) {
-    throw new Error(
-      "Anonymous sign-in failed. Enable Anonymous Sign-Ins in Supabase."
+    post.dataset.postId = "post-" + slug;
+    post.id = post.id || post.dataset.postId;
+
+    return post.dataset.postId;
+  }
+
+  function findPostActionButton(post, action) {
+    const explicit = post.querySelector(
+      `[data-action="${action}"], [data-post-action="${action}"]`
+    );
+
+    if (explicit) return explicit;
+
+    const pattern = new RegExp("\\b" + action + "\\b", "i");
+
+    return Array.from(
+      post.querySelectorAll("button, [role='button'], a")
+    ).find((element) =>
+      pattern.test((element.textContent || "").trim())
     );
   }
 
-  return data.user;
-}
-
-function setupCommentButtons() {
-  if (!supabaseClient) return;
-
-  document.querySelectorAll(".work-post").forEach((post) => {
-    const postId = getPostId(post);
-    const commentButton = findPostActionButton(post, "comment");
-
-    if (!commentButton || commentButton.dataset.commentReady === "true") {
-      return;
+  async function ensureAnonymousOrExistingUser() {
+    if (!supabaseClient) {
+      throw new Error("Supabase client did not load.");
     }
 
-    commentButton.dataset.commentReady = "true";
-    if (commentButton.tagName === "BUTTON") {
-      commentButton.type = "button";
+    const { data, error } =
+      await supabaseClient.auth.getSession();
+
+    if (error) throw error;
+
+    if (data?.session?.user) {
+      return data.session.user;
     }
 
-    const panel = document.createElement("div");
-    panel.className = "comments-panel";
-    panel.hidden = true;
-    panel.style.cssText =
-      "margin-top:12px;padding:14px;border:1px solid #ddd;border-radius:12px;";
+    const { data: anonymousData, error: anonymousError } =
+      await supabaseClient.auth.signInAnonymously();
 
-    const list = document.createElement("div");
-    list.className = "comments-list";
-    list.setAttribute("aria-live", "polite");
+    if (anonymousError) throw anonymousError;
 
-    const form = document.createElement("form");
-    form.className = "comment-form";
-
-    const nameInput = document.createElement("input");
-    nameInput.type = "text";
-    nameInput.maxLength = 80;
-    nameInput.required = true;
-    nameInput.placeholder = "Your name";
-    nameInput.setAttribute("aria-label", "Your name");
-
-    const commentInput = document.createElement("textarea");
-    commentInput.maxLength = 1000;
-    commentInput.required = true;
-    commentInput.placeholder = "Write a comment...";
-    commentInput.setAttribute("aria-label", "Write a comment");
-
-    const submitButton = document.createElement("button");
-    submitButton.type = "submit";
-    submitButton.textContent = "💬 Post Comment";
-
-    form.append(nameInput, commentInput, submitButton);
-    panel.append(list, form);
-    commentButton.insertAdjacentElement("afterend", panel);
-
-    async function loadComments() {
-      list.replaceChildren();
-
-      const loading = document.createElement("p");
-      loading.textContent = "Loading comments...";
-      list.appendChild(loading);
-
-      const { data, error } = await supabaseClient
-        .from("post_comments")
-        .select("id, display_name, comment_text, created_at")
-        .eq("post_id", postId)
-        .order("created_at", { ascending: true });
-
-      if (error) throw error;
-
-      list.replaceChildren();
-
-      if (!data || data.length === 0) {
-        const empty = document.createElement("p");
-        empty.textContent = "No comments yet. Be the first to comment!";
-        list.appendChild(empty);
-        return;
-      }
-
-      data.forEach((comment) => {
-        const item = document.createElement("article");
-        item.className = "comment-item";
-        item.style.cssText =
-          "padding:10px 0;border-bottom:1px solid #eee;";
-
-        const name = document.createElement("strong");
-        name.textContent = comment.display_name || "Visitor";
-
-        const text = document.createElement("p");
-        text.textContent = comment.comment_text || "";
-        text.style.whiteSpace = "pre-wrap";
-
-        const date = document.createElement("small");
-        date.textContent = comment.created_at
-          ? new Date(comment.created_at).toLocaleString()
-          : "";
-
-        item.append(name, text, date);
-        list.appendChild(item);
-      });
+    if (!anonymousData?.user) {
+      throw new Error(
+        "Anonymous sign-in failed. Enable Anonymous Sign-Ins in Supabase."
+      );
     }
 
-    commentButton.addEventListener("click", async (event) => {
-      event.preventDefault();
-      panel.hidden = !panel.hidden;
+    return anonymousData.user;
+  }
 
-      if (!panel.hidden) {
-        try {
-          await loadComments();
-          nameInput.focus();
-        } catch (error) {
-          console.error("Loading comments failed:", error);
-          notify("Could not load comments. Check Supabase permissions.", "error");
-        }
-      }
-    });
+  /* 4. CONTACT FORM AND ORDER SUBMISSION */
+
+  function setupContactForm() {
+    const form = document.getElementById("contactForm");
+
+    if (!form || form.dataset.ready === "true") return;
+
+    form.dataset.ready = "true";
 
     form.addEventListener("submit", async (event) => {
       event.preventDefault();
 
-      const displayName = nameInput.value.trim();
-      const commentText = commentInput.value.trim();
-
-      if (!displayName || displayName.length > 80) {
-        notify("Enter your name (maximum 80 characters).", "warning");
+      if (!supabaseClient) {
+        notify("Supabase connection failed.", "error");
         return;
       }
 
-      if (!commentText || commentText.length > 1000) {
-        notify("Write a comment (maximum 1000 characters).", "warning");
+      const nameInput = document.getElementById("contactName");
+      const emailInput = document.getElementById("contactEmail");
+      const serviceInput = document.getElementById("contactService");
+      const messageInput = document.getElementById("contactMessage");
+      const submitButton = form.querySelector('[type="submit"]');
+
+      if (!nameInput || !emailInput || !serviceInput || !messageInput) {
+        notify("Contact form fields are missing.", "error");
         return;
       }
 
-      submitButton.disabled = true;
-      submitButton.textContent = "Posting...";
+      const customerName = nameInput.value.trim();
+      const customerEmail = emailInput.value.trim();
+      const service = serviceInput.value;
+      const message = messageInput.value.trim();
+
+      if (!customerName || !customerEmail || !service || !message) {
+        notify("Please complete all fields.", "warning");
+        return;
+      }
+
+      if (!emailInput.checkValidity()) {
+        notify("Enter a valid email address.", "warning");
+        emailInput.focus();
+        return;
+      }
+
+      const oldText = submitButton?.textContent || "Send Message";
+
+      if (submitButton) {
+        submitButton.disabled = true;
+        submitButton.textContent = "Submitting...";
+      }
 
       try {
-        const user = await ensureCommentUser();
+        const { data: authData, error: authError } =
+          await supabaseClient.auth.getUser();
 
-        const { error } = await supabaseClient
-          .from("post_comments")
-          .insert({
-            post_id: postId,
-            display_name: displayName,
-            comment_text: commentText,
-            user_id: user.id
-          });
+        if (authError) throw authError;
 
-        if (error) throw error;
+        const user = authData?.user;
 
-        commentInput.value = "";
-        await loadComments();
-        notify("Comment posted successfully!", "success");
-      } catch (error) {
-        console.error("Post comment error:", error);
+        if (!user) {
+          sessionStorage.setItem("pendingOrderForm", "true");
+
+          notify(
+            "Please log in before placing an order.",
+            "warning"
+          );
+
+          setTimeout(() => {
+            window.location.href = "login.html";
+          }, 1000);
+
+          return;
+        }
+
+        const { data: order, error: orderError } =
+          await supabaseClient
+            .from("orders")
+            .insert({
+              customer_id: user.id,
+              customer_name: customerName,
+              customer_email: user.email || customerEmail,
+              service: service,
+              message: message,
+              status: "Pending",
+              progress: 0
+            })
+            .select("order_id")
+            .single();
+
+        if (orderError) throw orderError;
+
+        if (!order?.order_id) {
+          throw new Error("Order ID was not returned.");
+        }
+
+        form.reset();
+
         notify(
-          "Comment failed: " + (error.message || "Check Supabase settings."),
+          "Order submitted! Order ID: " + order.order_id,
+          "success"
+        );
+
+        alert(
+          "Order submitted successfully!\n\n" +
+          "Order ID: " + order.order_id +
+          "\nStatus: Pending\n\n" +
+          "Track your order from your customer dashboard."
+        );
+
+      } catch (error) {
+        console.error("Order submission error:", error);
+
+        notify(
+          "Order failed: " + (error?.message || "Unknown error"),
           "error"
         );
+
       } finally {
-        submitButton.disabled = false;
-        submitButton.textContent = "💬 Post Comment";
+        if (submitButton) {
+          submitButton.disabled = false;
+          submitButton.textContent = oldText;
+        }
       }
     });
-  });
-}
+  }
 
-/* ---------- 7. SHARE ---------- */
+  /* 5. LIKE / UNLIKE */
 
-function setupShareButtons() {
-  document.querySelectorAll(".work-post").forEach((post) => {
-    const shareButton = findPostActionButton(post, "share");
+  async function setupLikeButtons() {
+    if (!supabaseClient) return;
 
-    if (!shareButton || shareButton.dataset.shareReady === "true") {
-      return;
-    }
+    document.querySelectorAll(".work-post").forEach((post) => {
+      const postId = getPostId(post);
+      const button = findPostActionButton(post, "like");
 
-    const postId = getPostId(post);
-    shareButton.dataset.shareReady = "true";
+      if (!button || button.dataset.likeReady === "true") return;
 
-    if (shareButton.tagName === "BUTTON") {
-      shareButton.type = "button";
-    }
+      button.dataset.likeReady = "true";
 
-    shareButton.addEventListener("click", async (event) => {
-      event.preventDefault();
-
-      const heading = post.querySelector("h2, h3, h4");
-      const title = heading?.textContent?.trim() || "Ruddranil.io Work";
-      const url = new URL(window.location.href);
-
-      url.hash = postId;
-
-      const shareData = {
-        title,
-        text: "Check out this work on Ruddranil.io",
-        url: url.href
-      };
-
-      try {
-        if (typeof navigator.share === "function") {
-          await navigator.share(shareData);
-          notify("Post shared successfully.", "success");
-          return;
-        }
-      } catch (error) {
-        if (error?.name === "AbortError") return;
-        console.warn("Native share unavailable:", error);
-      }
-
-      try {
-        if (navigator.clipboard?.writeText && window.isSecureContext) {
-          await navigator.clipboard.writeText(shareData.url);
-          notify("Post link copied. You can share it now.", "success");
-          return;
-        }
-      } catch (error) {
-        console.warn("Clipboard copy failed:", error);
-      }
-
-      window.prompt("Copy this post link:", shareData.url);
-    });
-  });
-}
-
-/* ---------- 8. VIEW PROJECT / ORDER SIMILAR ---------- */
-
-function setupProjectButtons() {
-  document.querySelectorAll(".work-post").forEach((post) => {
-    const buttons = Array.from(post.querySelectorAll("button"));
-
-    buttons.forEach((button) => {
-      if (button.dataset.projectActionReady === "true") return;
-
-      if (/^view project$/i.test(button.textContent.trim())) {
-        button.dataset.projectActionReady = "true";
+      if (button.tagName === "BUTTON") {
         button.type = "button";
+      }
 
-        button.addEventListener("click", () => {
-          const link = post.querySelector("a[href]");
+      async function refreshLike() {
+        const { count, error: countError } =
+          await supabaseClient
+            .from("post_likes")
+            .select("*", { count: "exact", head: true })
+            .eq("post_id", postId);
 
-          if (link) {
-            window.location.href = link.href;
+        if (countError) throw countError;
+
+        const { data: sessionData, error: sessionError } =
+          await supabaseClient.auth.getSession();
+
+        if (sessionError) throw sessionError;
+
+        const user = sessionData?.session?.user;
+        let likedByMe = false;
+
+        if (user) {
+          const { data, error } = await supabaseClient
+            .from("post_likes")
+            .select("id")
+            .eq("post_id", postId)
+            .eq("user_id", user.id)
+            .maybeSingle();
+
+          if (error) throw error;
+
+          likedByMe = Boolean(data);
+        }
+
+        button.textContent =
+          (likedByMe ? "♥ Liked" : "♡ Like") +
+          " (" + (count || 0) + ")";
+
+        button.setAttribute("aria-pressed", String(likedByMe));
+        button.dataset.liked = String(likedByMe);
+      }
+
+      button.addEventListener("click", async (event) => {
+        event.preventDefault();
+
+        if (button.disabled) return;
+
+        button.disabled = true;
+
+        try {
+          const user = await ensureAnonymousOrExistingUser();
+
+          const { data: existing, error: findError } =
+            await supabaseClient
+              .from("post_likes")
+              .select("id")
+              .eq("post_id", postId)
+              .eq("user_id", user.id)
+              .maybeSingle();
+
+          if (findError) throw findError;
+
+          if (existing) {
+            const { error } = await supabaseClient
+              .from("post_likes")
+              .delete()
+              .eq("id", existing.id);
+
+            if (error) throw error;
           } else {
-            notify(
-              "Project details are not linked yet. Add a project URL to this post.",
-              "info"
-            );
+            const { error } = await supabaseClient
+              .from("post_likes")
+              .insert({
+                post_id: postId,
+                user_id: user.id
+              });
+
+            if (error) throw error;
           }
+
+          await refreshLike();
+
+        } catch (error) {
+          console.error("Like error:", error);
+
+          notify(
+            "Like failed: " + (error?.message || "Check Supabase policies."),
+            "error"
+          );
+
+        } finally {
+          button.disabled = false;
+        }
+      });
+
+      refreshLike().catch((error) => {
+        console.error("Could not load likes:", error);
+        button.textContent = "♡ Like";
+      });
+    });
+  }
+
+  /* 6. COMMENTS */
+
+  function setupCommentButtons() {
+    if (!supabaseClient) return;
+
+    document.querySelectorAll(".work-post").forEach((post) => {
+      const postId = getPostId(post);
+      const button = findPostActionButton(post, "comment");
+
+      if (!button || button.dataset.commentReady === "true") return;
+
+      button.dataset.commentReady = "true";
+
+      if (button.tagName === "BUTTON") {
+        button.type = "button";
+      }
+
+      button.textContent = "💬 Comment";
+
+      const panel = document.createElement("div");
+      panel.className = "comment-panel";
+      panel.hidden = true;
+
+      Object.assign(panel.style, {
+        marginTop: "14px",
+        padding: "14px",
+        borderRadius: "12px",
+        background: "rgba(127,127,127,.08)"
+      });
+
+      const list = document.createElement("div");
+      const form = document.createElement("form");
+
+      Object.assign(form.style, {
+        display: "grid",
+        gap: "10px",
+        marginTop: "12px"
+      });
+
+      const nameInput = document.createElement("input");
+      nameInput.type = "text";
+      nameInput.placeholder = "Your name";
+      nameInput.maxLength = 80;
+      nameInput.required = true;
+
+      const commentInput = document.createElement("textarea");
+      commentInput.placeholder = "Write a comment...";
+      commentInput.maxLength = 1000;
+      commentInput.rows = 3;
+      commentInput.required = true;
+
+      const submit = document.createElement("button");
+      submit.type = "submit";
+      submit.textContent = "💬 Post Comment";
+
+      [nameInput, commentInput].forEach((input) => {
+        Object.assign(input.style, {
+          width: "100%",
+          boxSizing: "border-box",
+          padding: "11px",
+          border: "1px solid #aaa",
+          borderRadius: "9px",
+          font: "inherit"
+        });
+      });
+
+      async function loadComments() {
+        list.replaceChildren();
+
+        const { data, error } = await supabaseClient
+          .from("post_comments")
+          .select("id, display_name, comment_text, created_at")
+          .eq("post_id", postId)
+          .order("created_at", { ascending: true });
+
+        if (error) {
+          console.error("Load comments error:", error);
+          list.textContent = "Could not load comments.";
+          return;
+        }
+
+        if (!data || data.length === 0) {
+          list.textContent = "No comments yet.";
+          return;
+        }
+
+        data.forEach((comment) => {
+          const item = document.createElement("div");
+          item.style.padding = "10px 0";
+          item.style.borderBottom = "1px solid rgba(127,127,127,.25)";
+
+          const name = document.createElement("strong");
+          name.textContent = comment.display_name || "Visitor";
+
+          const text = document.createElement("p");
+          text.textContent = comment.comment_text;
+          text.style.margin = "5px 0";
+
+          const date = document.createElement("small");
+          date.textContent = comment.created_at
+            ? new Date(comment.created_at).toLocaleString()
+            : "";
+
+          item.append(name, text, date);
+          list.appendChild(item);
         });
       }
 
-      if (/^order similar$/i.test(button.textContent.trim())) {
-        button.dataset.projectActionReady = "true";
-        button.type = "button";
+      form.append(nameInput, commentInput, submit);
+      panel.append(list, form);
+      button.insertAdjacentElement("afterend", panel);
 
-        button.addEventListener("click", () => {
+      button.addEventListener("click", async (event) => {
+        event.preventDefault();
+        panel.hidden = !panel.hidden;
+
+        if (!panel.hidden) {
+          await loadComments();
+        }
+      });
+
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        const displayName = nameInput.value.trim();
+        const commentText = commentInput.value.trim();
+
+        if (!displayName || displayName.length > 80) {
+          notify("Enter your name (maximum 80 characters).", "warning");
+          return;
+        }
+
+        if (!commentText || commentText.length > 1000) {
+          notify("Write a comment (maximum 1000 characters).", "warning");
+          return;
+        }
+
+        submit.disabled = true;
+        submit.textContent = "Posting...";
+
+        try {
+          const user = await ensureAnonymousOrExistingUser();
+
+          const { error } = await supabaseClient
+            .from("post_comments")
+            .insert({
+              post_id: postId,
+              display_name: displayName,
+              comment_text: commentText,
+              user_id: user.id
+            });
+
+          if (error) throw error;
+
+          commentInput.value = "";
+          await loadComments();
+
+          notify("Comment posted successfully.", "success");
+
+        } catch (error) {
+          console.error("Comment error:", error);
+
+          notify(
+            "Comment failed: " + (error?.message || "Check Supabase policies."),
+            "error"
+          );
+
+        } finally {
+          submit.disabled = false;
+          submit.textContent = "💬 Post Comment";
+        }
+      });
+    });
+  }
+
+  /* 7. SHARE BUTTON */
+
+  function setupShareButtons() {
+    document.querySelectorAll(".work-post").forEach((post) => {
+      const button = findPostActionButton(post, "share");
+
+      if (!button || button.dataset.shareReady === "true") return;
+
+      button.dataset.shareReady = "true";
+
+      if (button.tagName === "BUTTON") {
+        button.type = "button";
+      }
+
+      button.addEventListener("click", async (event) => {
+        event.preventDefault();
+
+        const heading = post.querySelector("h2, h3, h4");
+        const title = heading?.textContent?.trim() || "Ruddranil.io Work";
+
+        const url = new URL(window.location.href);
+        url.hash = getPostId(post);
+
+        try {
+          if (navigator.share) {
+            await navigator.share({
+              title,
+              text: "Check out this work on Ruddranil.io",
+              url: url.href
+            });
+            return;
+          }
+        } catch (error) {
+          if (error?.name === "AbortError") return;
+          console.warn("Native share failed:", error);
+        }
+
+        try {
+          if (navigator.clipboard && window.isSecureContext) {
+            await navigator.clipboard.writeText(url.href);
+            notify("Post link copied.", "success");
+            return;
+          }
+        } catch (error) {
+          console.warn("Clipboard failed:", error);
+        }
+
+        window.prompt("Copy this post link:", url.href);
+      });
+    });
+  }
+
+  /* 8. ORDER SIMILAR */
+
+  function setupProjectButtons() {
+    document.querySelectorAll(".work-post").forEach((post) => {
+      const orderLink = post.querySelector(".post-order-btn");
+
+      if (orderLink && orderLink.dataset.ready !== "true") {
+        orderLink.dataset.ready = "true";
+
+        orderLink.addEventListener("click", (event) => {
           const serviceSelect = document.getElementById("contactService");
-          const contactSection = document.getElementById("contact");
 
           if (serviceSelect) {
-            const text = post.textContent.toLowerCase();
+            const content = post.textContent.toLowerCase();
 
-            if (text.includes("website")) {
+            if (content.includes("website")) {
               serviceSelect.value = "website";
-            } else if (text.includes("graphic") || text.includes("design")) {
+            } else if (content.includes("graphic") || content.includes("design")) {
               serviceSelect.value = "graphics";
-            } else if (text.includes("seo")) {
+            } else if (content.includes("seo")) {
               serviceSelect.value = "yt-seo";
-            } else if (text.includes("youtube")) {
+            } else if (content.includes("youtube")) {
               serviceSelect.value = "yt-marketing";
-            } else if (text.includes("facebook")) {
+            } else if (content.includes("facebook")) {
               serviceSelect.value = "fb-marketing";
             }
           }
 
-          if (contactSection) {
-            contactSection.scrollIntoView({ behavior: "smooth" });
-          } else {
-            window.location.hash = "contact";
+          const contact = document.getElementById("contact");
+
+          if (contact) {
+            event.preventDefault();
+            contact.scrollIntoView({ behavior: "smooth" });
           }
-
-          notify(
-            "Fill in the contact form to request similar work.",
-            "info"
-          );
         });
       }
     });
-  });
-}
+  }
 
-/* ---------- 9. MOBILE MENU ---------- */
+  /* 9. MOBILE MENU */
 
-function setupMobileMenu() {
-  const menuButton = document.querySelector(
-    "#menuToggle, #menuBtn, .menu-toggle, .hamburger, [aria-label='Open menu']"
-  );
+  function setupMobileMenu() {
+    const menuButton = document.querySelector(
+      "#menuToggle, #menuBtn, .menu-toggle, .hamburger"
+    );
 
-  const closeButton = document.querySelector(
-    "#closeMenu, .close-menu, .sidebar-close"
-  );
+    const nav = document.querySelector(
+      "#mainNav, #sidebar, .sidebar, .mobile-menu, .nav-menu"
+    );
 
-  const sidebar = document.querySelector(
-    "#sidebar, .sidebar, .mobile-menu, .nav-menu"
-  );
+    const closeButton = document.querySelector(
+      "#closeMenu, .close-menu, .sidebar-close"
+    );
 
-  if (!sidebar) return;
+    if (!nav) return;
 
-  function openMenu() {
-    sidebar.classList.add("active", "open");
-    sidebar.setAttribute("aria-expanded", "true");
-    document.body.classList.add("menu-open");
-
-    if (menuButton) {
-      menuButton.setAttribute("aria-expanded", "true");
+    function openMenu() {
+      nav.classList.add("active", "open");
+      nav.setAttribute("aria-expanded", "true");
+      document.body.classList.add("menu-open");
+      menuButton?.setAttribute("aria-expanded", "true");
     }
-  }
 
-  function closeMenu() {
-    sidebar.classList.remove("active", "open");
-    sidebar.setAttribute("aria-expanded", "false");
-    document.body.classList.remove("menu-open");
-
-    if (menuButton) {
-      menuButton.setAttribute("aria-expanded", "false");
+    function closeMenu() {
+      nav.classList.remove("active", "open");
+      nav.setAttribute("aria-expanded", "false");
+      document.body.classList.remove("menu-open");
+      menuButton?.setAttribute("aria-expanded", "false");
     }
-  }
 
-  menuButton?.addEventListener("click", openMenu);
-  closeButton?.addEventListener("click", closeMenu);
-
-  sidebar.querySelectorAll("a").forEach((link) => {
-    link.addEventListener("click", closeMenu);
-  });
-
-  document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape") closeMenu();
-  });
-}
-
-/* ---------- 10. SMOOTH SCROLL ---------- */
-
-function setupSmoothScroll() {
-  document.querySelectorAll('a[href^="#"]').forEach((link) => {
-    if (link.dataset.smoothScrollReady === "true") return;
-    link.dataset.smoothScrollReady = "true";
-
-    link.addEventListener("click", (event) => {
-      const href = link.getAttribute("href");
-
-      if (!href || href === "#") return;
-
-      let target;
-
-      try {
-        target = document.querySelector(href);
-      } catch {
-        return;
-      }
-
-      if (target) {
-        event.preventDefault();
-        target.scrollIntoView({
-          behavior: "smooth",
-          block: "start"
-        });
-
-        history.replaceState(null, "", href);
-      }
-    });
-  });
-} 
-
-/* ---------- 11. BACK TO TOP ---------- */
-
-function setupBackToTop() {
-  const button = document.getElementById("backToTop");
-
-  if (!button || button.dataset.backToTopReady === "true") return;
-
-  button.dataset.backToTopReady = "true";
-  button.type = "button";
-
-  button.addEventListener("click", () => {
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth"
-    });
-  });
-
-  function updateButton() {
-    button.hidden = window.scrollY < 300;
-  }
-
-  window.addEventListener("scroll", updateButton, { passive: true });
-  updateButton();
-}
-
-/* ---------- 12. REMEMBER ME ---------- */
-
-function setupRememberMe() {
-  const rememberCheckbox = document.querySelector(
-    "#rememberMe, input[name='rememberMe'], input[name='remember']"
-  );
-
-  const emailInput = document.querySelector(
-    "#loginEmail, #email, input[type='email']"
-  );
-
-  if (!rememberCheckbox || !emailInput) return;
-
-  let savedEmail = "";
-
-  try {
-    savedEmail = localStorage.getItem("ruddranil-remembered-email") || "";
-  } catch (error) {
-    console.warn("Remember Me storage unavailable:", error);
-  }
-
-  if (savedEmail) {
-    emailInput.value = savedEmail;
-    rememberCheckbox.checked = true;
-  }
-
-  function saveRememberedEmail() {
-    try {
-      if (rememberCheckbox.checked) {
-        localStorage.setItem(
-          "ruddranil-remembered-email",
-          emailInput.value.trim()
-        );
+    menuButton?.addEventListener("click", () => {
+      if (nav.classList.contains("active") || nav.classList.contains("open")) {
+        closeMenu();
       } else {
-        localStorage.removeItem("ruddranil-remembered-email");
+        openMenu();
       }
-    } catch (error) {
-      console.warn("Could not save remembered email:", error);
-    }
+    });
+
+    closeButton?.addEventListener("click", closeMenu);
+
+    nav.querySelectorAll("a").forEach((link) => {
+      link.addEventListener("click", closeMenu);
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") closeMenu();
+    });
   }
 
-  rememberCheckbox.addEventListener("change", saveRememberedEmail);
-  emailInput.addEventListener("change", saveRememberedEmail);
-}
+  /* 10. SMOOTH SCROLL */
 
-/* ---------- 13. INITIALIZE ALL FEATURES ---------- */
+  function setupSmoothScroll() {
+    document.querySelectorAll('a[href^="#"]').forEach((link) => {
+      link.addEventListener("click", (event) => {
+        const href = link.getAttribute("href");
 
-function initializeWebsite() {
-  const features = [
-    ["Like buttons", setupLikeButtons],
-    ["Comment buttons", setupCommentButtons],
-    ["Share buttons", setupShareButtons],
-    ["Project buttons", setupProjectButtons],
-    ["Mobile menu", setupMobileMenu],
-    ["Smooth scroll", setupSmoothScroll],
-    ["Back to top", setupBackToTop],
-    ["Remember me", setupRememberMe]
-  ];
+        if (!href || href === "#") return;
 
-  console.log("Initializing Ruddranil.io...");
+        let target;
 
-  features.forEach(([name, setup]) => {
+        try {
+          target = document.querySelector(href);
+        } catch {
+          return;
+        }
+
+        if (target) {
+          event.preventDefault();
+          target.scrollIntoView({
+            behavior: "smooth",
+            block: "start"
+          });
+          history.replaceState(null, "", href);
+        }
+      });
+    });
+  }
+
+  /* 11. BACK TO TOP */
+
+  function setupBackToTop() {
+    const button = document.getElementById("backToTop");
+
+    if (!button) return;
+
+    button.addEventListener("click", () => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+
+    function updateButton() {
+      button.hidden = window.scrollY < 300;
+    }
+
+    window.addEventListener("scroll", updateButton, { passive: true });
+    updateButton();
+  }
+
+  /* 12. REMEMBER ME */
+
+  function setupRememberMe() {
+    const checkbox = document.querySelector(
+      "#rememberMe, input[name='rememberMe'], input[name='remember']"
+    );
+
+    const emailInput = document.querySelector(
+      "#loginEmail, #email, input[type='email']"
+    );
+
+    if (!checkbox || !emailInput) return;
+
+    const storageKey = "ruddranil-remembered-email";
+
     try {
-      console.log("Starting:", name);
+      const savedEmail = localStorage.getItem(storageKey);
 
-      const result = setup();
-
-      if (result && typeof result.catch === "function") {
-        result.catch((error) => {
-          console.error(name + " initialization failed:", error);
-        });
+      if (savedEmail) {
+        emailInput.value = savedEmail;
+        checkbox.checked = true;
       }
-
-      console.log("Initialized:", name);
     } catch (error) {
-      console.error(name + " initialization failed:", error);
+      console.warn("Remember Me storage unavailable:", error);
     }
-  });
 
-  if (!supabaseClient) {
-    console.error("Supabase client is missing.");
-    notify("Supabase connection is unavailable.", "error");
-  } else {
-    console.log("Supabase client exists.");
+    function saveEmail() {
+      try {
+        if (checkbox.checked) {
+          localStorage.setItem(storageKey, emailInput.value.trim());
+        } else {
+          localStorage.removeItem(storageKey);
+        }
+      } catch (error) {
+        console.warn("Could not save remembered email:", error);
+      }
+    }
+
+    checkbox.addEventListener("change", saveEmail);
+    emailInput.addEventListener("change", saveEmail);
   }
-}
 
-if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", initializeWebsite);
-} else {
-  initializeWebsite();
-}
+  /* 13. INITIALIZE */
+
+  function initializeWebsite() {
+    const features = [
+      ["Contact form", setupContactForm],
+      ["Like buttons", setupLikeButtons],
+      ["Comment buttons", setupCommentButtons],
+      ["Share buttons", setupShareButtons],
+      ["Project buttons", setupProjectButtons],
+      ["Mobile menu", setupMobileMenu],
+      ["Smooth scroll", setupSmoothScroll],
+      ["Back to top", setupBackToTop],
+      ["Remember Me", setupRememberMe]
+    ];
+
+    features.forEach(([name, setup]) => {
+      try {
+        const result = setup();
+
+        if (result && typeof result.catch === "function") {
+          result.catch((error) => {
+            console.error(name + " initialization failed:", error);
+          });
+        }
+      } catch (error) {
+        console.error(name + " initialization failed:", error);
+      }
+    });
+
+    console.log("Ruddranil.io script initialized.");
+
+    if (!supabaseClient) {
+      notify(
+        "Supabase did not load. Check the CDN script in index.html.",
+        "error"
+      );
+    }
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initializeWebsite);
+  } else {
+    initializeWebsite();
+  }
+
 })();
