@@ -29,24 +29,25 @@
           .eq("user_id", user.id)
           .maybeSingle();
 
-        if (error) throw error;
-        likedByMe = Boolean(data);
-      }
-
-      likeButton.textContent =
-        (likedByMe ? "♥ Liked" : "♡ Like") + " (" + (count || 0) + ")";
-
-      likeButton.setAttribute("aria-pressed", String(likedByMe));
-      likeButton.dataset.liked = String(likedByMe);
+    if (error) throw error;
+      likedByMe = Boolean(data);
     }
 
-    likeButton.addEventListener("click", async (event) => {
-      event.preventDefault();
+    likeButton.textContent =
+      (likedByMe ? "♥ Liked" : "♡ Like") + " (" + (count || 0) + ")";
 
-      if (likeButton.dataset.processing === "true") return;
-      likeButton.dataset.processing = "true";
-      likeButton.disabled = true;
+    likeButton.setAttribute("aria-pressed", String(likedByMe));
+    likeButton.dataset.liked = String(likedByMe);
+  }
 
+  likeButton.addEventListener("click", async (event) => {
+    event.preventDefault();
+
+    if (likeButton.dataset.processing === "true") return;
+
+    likeButton.dataset.processing = "true";
+    likeButton.disabled = true;
+     
       try {
         const user = await ensureLikeUser();
         const currentlyLiked = likeButton.dataset.liked === "true";
